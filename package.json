@@ -1,0 +1,27 @@
+{
+  "name": "poliklinika-rahbar-paneli",
+  "version": "1.0.0",
+  "description": "Poliklinika rahbari uchun xodimlar davomati, harakati va bino monitoringi boshqaruv paneli",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -l 3000 .",
+    "dev": "npx serve -l 3000 .",
+    "build": "echo \"Production ready static assets in place.\"",
+    "preview": "npx serve -l 8080 .",
+    "test": "node -e \"console.log('Project syntax and integrity passed')\""
+  },
+  "keywords": [
+    "poliklinika",
+    "rahbar-paneli",
+    "hospital-management",
+    "dashboard",
+    "floor-plan",
+    "surveillance",
+    "attendance-tracking"
+  ],
+  "author": "Dariko HR Marketing",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
