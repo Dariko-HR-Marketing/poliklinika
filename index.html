@@ -177,12 +177,6 @@ input[aria-invalid=true]{border-color:#bc6474}
 <header class="header">
   <div class="topline">
     <div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#brand-mark"/></svg><div><strong>Poliklinika</strong><small>Rahbar nazorati</small></div></div>
-    <nav class="tabs" role="tablist" aria-label="Prototip bo‘limlari">
-      <button class="tab" type="button" id="tab-login" role="tab" aria-controls="view-login" aria-selected="true">Kirish</button>
-      <button class="tab" type="button" id="tab-architecture" role="tab" aria-controls="view-architecture" aria-selected="false" tabindex="-1">Arxitektura</button>
-      <button class="tab" type="button" id="tab-brand" role="tab" aria-controls="view-brand" aria-selected="false" tabindex="-1">Brend</button>
-    </nav>
-    <span class="prototype">Interaktiv prototip</span>
   </div>
 </header>
 <main class="shell">
@@ -229,10 +223,10 @@ input[aria-invalid=true]{border-color:#bc6474}
             <p class="subtext">Rahbar panelini ochish uchun login va parolni kiriting.</p>
             <form id="login-form" novalidate>
               <label class="field-label" for="username">Login</label>
-              <input id="username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="admin yoki rahbar" required aria-describedby="demo-hint">
+              <input id="username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="Loginni kiriting" required>
               <label class="field-label" for="password">Parol</label>
               <div class="passline">
-                <input id="password" type="password" autocomplete="off" placeholder="admin123 yoki demo" maxlength="50" required aria-describedby="demo-hint">
+                <input id="password" type="password" autocomplete="off" placeholder="Parolni kiriting" maxlength="50" required>
                 <button class="reveal" type="button" id="reveal" aria-pressed="false" aria-label="Parolni ko‘rsatish">
                   <svg class="icon" aria-hidden="true"><use href="#eye"/><path class="eye-slash" d="m4 4 16 16"/></svg>
                 </button>
@@ -240,10 +234,6 @@ input[aria-invalid=true]{border-color:#bc6474}
               <p class="notice" id="warning" role="status" aria-live="polite" hidden></p>
               <button class="button primary full" type="submit" id="submit"><span id="submit-label">Kirish</span><svg class="icon" id="submit-arrow" aria-hidden="true"><use href="#arrow"/></svg><span class="loader" id="loader" aria-hidden="true" hidden></span></button>
             </form>
-            <div class="demo-actions">
-              <button class="text-button" type="button" id="fill-demo">Demo login va parolni qo‘yish</button>
-              <span id="demo-hint" class="ejected">Login: <code>admin</code> · Parol: <code>admin123</code> (yoki <code>rahbar</code> / <code>demo</code>)</span>
-            </div>
           </div>
           <div id="signed-view" hidden>
             <span class="status-icon" aria-hidden="true"><svg class="icon"><use href="#check"/></svg></span>
@@ -262,15 +252,6 @@ input[aria-invalid=true]{border-color:#bc6474}
         </div>
       </section>
     </div>
-    <aside class="panel sandbox" aria-label="Kirish ssenariylari">
-      <div class="sandbox-title"><svg class="icon" aria-hidden="true"><use href="#flask"/></svg><strong>Sinov ssenariylari</strong></div>
-      <div class="scenario-actions">
-        <button class="button" type="button" data-scenario="success" aria-pressed="false">Demo ma’lumotlarini to‘ldirish</button>
-        <button class="button" type="button" data-scenario="wrong" aria-pressed="false">Xato login yoki parol</button>
-        <button class="button" type="button" data-scenario="limited" aria-pressed="false">Vaqtincha cheklov</button>
-        <button class="button" type="button" data-scenario="reset" aria-pressed="false">Qayta boshlash</button>
-      </div>
-    </aside>
   </div>
   <section class="panel" id="view-architecture" role="tabpanel" aria-labelledby="tab-architecture" hidden>
     <div class="panel-header">
@@ -318,7 +299,6 @@ input[aria-invalid=true]{border-color:#bc6474}
       </div>
     </div>
   </section>
-  <footer class="foot"><span>Interaktiv namoyish · Shaxsiy ma’lumotlar ishlatilmagan.</span><span>Autentifikatsiya jarayoni brauzerda simulyatsiya qilinadi.</span></footer>
 </main>
 <script>
 'use strict';
@@ -434,22 +414,15 @@ function clearLogin() {
 function showLimit() {
   if (input) input.value = '';
   controls('limited');
-  chooseScenario('limited');
-  message('5 ta xato urinishdan keyin kirish vaqtincha cheklanadi. Demoni davom ettirish uchun «Qayta boshlash»ni bosing.', 'warning');
+  message('5 ta xato urinishdan keyin kirish vaqtincha cheklanadi.', 'warning');
 }
 
 function isCredentialsValid(u, p) {
   const cleanU = (u || '').trim().toLowerCase();
   const cleanP = (p || '').trim();
   
-  // admin: admin123, parol123, admin, 12345
-  if (cleanU === 'admin' && ['admin123', 'parol123', 'admin', '12345'].includes(cleanP)) return true;
-  // rahbar: demo, 12345, rahbar, admin123
-  if (cleanU === 'rahbar' && ['demo', '12345', 'rahbar', 'admin123'].includes(cleanP)) return true;
-  // poliklinika: 12345, demo, admin
-  if (cleanU === 'poliklinika' && ['12345', 'demo', 'admin', 'admin123'].includes(cleanP)) return true;
-  // general test logins
-  if (['admin', 'rahbar', 'poliklinika', 'hikmatullo'].includes(cleanU) && cleanP.length >= 3) return true;
+  // Asosiy login va parol: admin / buxoro123123
+  if ((cleanU === 'admin' || cleanU === 'rahbar') && cleanP === 'buxoro123123') return true;
   return false;
 }
 
