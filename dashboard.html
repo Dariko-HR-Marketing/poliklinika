@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="uz">
 <head>
+<script>
+// Check if user is logged in
+if (sessionStorage.getItem('poliklinika_auth') !== 'true') {
+  window.location.replace('index.html');
+}
+</script>
+
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Uch qavatli poliklinika rahbari uchun xodimlar davomati va harakatini ko‘rish prototipi.">
 <title>Poliklinika · Rahbar nazorati</title>
@@ -68,6 +75,12 @@ dialog{background:#FFFFFF;color:var(--text);border:1px solid #9AB5CD;border-radi
     <a href="#tekshiruv" data-icon="bell" aria-label="Tekshiruvlar"><span>Tekshiruvlar</span></a>
   </nav>
   <div class="side-foot"><div class="avatar">R</div><div><strong>Rahbar</strong><small>Namoyish hisobi</small></div></div>
+
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid #DCE5EE;">
+    <a href="index.html" onclick="sessionStorage.removeItem('poliklinika_auth');" class="btn" style="width:100%;justify-content:center;color:#b6354d;border-color:#f1c2cb;background:#fff5f6;text-decoration:none;font-weight:700;">
+      <span>🚪 Tizimdan chiqish</span>
+    </a>
+  </div>
 </aside>
 <main>
 <section id="umumiy">
