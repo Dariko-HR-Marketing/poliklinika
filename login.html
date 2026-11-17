@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; form-action 'none'; base-uri 'none'">
+<title>Poliklinika · Kirish prototipi</title>
+<style>
+:root{
+  --page:#f3f6f5;--paper:#fff;--ink:#162a29;--muted:#4f6664;--deep:#103c34;--green:#08644f;
+  --green-hover:#064d3e;--mint:#dff3eb;--border:#d8e5e0;--navy:#1d334d;--error:#982e44;--error-bg:#fff2f4;
+  --warning:#805318;--warning-bg:#fff7ea;
+  font:15px/1.45 Geist,Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--page);font-synthesis:none
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-width:320px}
+h1,h2,h3,p,ol{margin:0}
+button,input,a{font:inherit}
+button,a{cursor:pointer;color:inherit;text-decoration:none}
+button:disabled{cursor:not-allowed}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.header{position:relative;background:var(--paper);border-bottom:1px solid var(--border)}
+.topline,.shell{width:min(calc(100% - 64px),1230px);margin-inline:auto}
+.topline{display:flex;min-height:72px;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:11px;color:var(--ink);white-space:nowrap}
+.brand strong{display:block;line-height:1.1;font-size:17px;letter-spacing:-.035em}
+.brand small{font-size:11px;color:var(--muted)}
+.mark{width:41px;height:41px;flex:none}
+.tabs{display:flex;gap:4px;align-items:center}
+.tab{border:1px solid transparent;background:none;padding:8px 14px;border-radius:8px;color:var(--muted);font-size:13px;font-weight:650;white-space:nowrap}
+.tab[aria-selected=true]{background:#e9f4ef;color:var(--green);border-color:#d7eae1}
+.tab:hover:not([aria-selected=true]){background:#f2f6f4}
+.prototype{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px;color:var(--muted);font-weight:650}
+.prototype::before{content:"";height:7px;width:7px;border-radius:50%;background:#3b8a72}
+.shell{margin-block:37px 23px}
+.panel{border:1px solid var(--border);border-radius:23px;background:var(--paper);overflow:hidden;box-shadow:0 16px 50px #1f423a0b}
+.main-grid{display:grid;grid-template-columns:1.04fr .96fr;min-height:526px}
+.hero{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;background:linear-gradient(144deg,#f1f9f5 17%,#d9eee5 100%);padding:36px 42px 26px;border-right:1px solid #d8e9e1}
+.hero::before{position:absolute;content:"";inset:0;z-index:-1;background:radial-gradient(#195b4730 .8px,transparent .9px);background-size:16px 16px;mask-image:linear-gradient(135deg,transparent 32%,#000 85%)}
+.label{display:inline-flex;align-items:center;gap:7px;color:var(--green);font-size:11px;font-weight:730;letter-spacing:.095em;text-transform:uppercase}
+.hero h1{font-size:clamp(36px,5.2vw,63px);font-weight:710;line-height:1.02;letter-spacing:-.065em;margin-top:10px}
+.hero p{margin-top:11px;color:#3c6058;max-width:32ch;font-size:15px}
+.building{display:block;width:min(100%,535px);height:auto;max-height:324px;align-self:center;margin:0 auto -8px;overflow:visible}
+.building .storey{transform-box:fill-box;transform-origin:center;animation:assemble .64s both;animation-delay:var(--delay)}
+.building .route{stroke-dasharray:6 6;animation:route 4s linear both}
+.building .beacon{transform-box:fill-box;transform-origin:center;animation:beacon 2s ease-out 2 both}
+@keyframes assemble{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
+@keyframes route{to{stroke-dashoffset:-120}}
+@keyframes beacon{0%{opacity:.75;transform:scale(.6)}75%,100%{opacity:0;transform:scale(1.65)}}
+.fig-caption{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;color:#365e54;margin-top:auto}
+.fig-caption .icon{width:15px;height:15px}
+.signin{display:grid;place-items:center;padding:42px 50px;min-width:0}
+.signin-content{width:min(100%,386px)}
+.status-icon{display:grid;place-items:center;background:#eaf5ef;color:var(--green);width:45px;height:45px;border-radius:12px;border:1px solid #d9ede3;margin-bottom:16px}
+.signin h2,.panel-header h1{font-size:clamp(31px,4vw,46px);line-height:1.05;letter-spacing:-.055em;font-weight:710}
+.subtext{color:var(--muted);margin-top:10px;max-width:47ch}
+form{margin-top:24px}
+.field-label{display:block;margin-bottom:7px;font-size:13px;font-weight:730}
+.passline{position:relative}
+#username{padding-right:13px;margin-bottom:12px}
+input{width:100%;height:53px;border:1px solid #b8cdc3;border-radius:9px;background:#fcfdfc;padding:0 52px 0 13px;color:var(--ink)}
+input::placeholder{color:#5d726c}
+input[aria-invalid=true]{border-color:#bc6474}
+.reveal{position:absolute;top:5px;right:5px;bottom:5px;display:grid;place-items:center;width:43px;border:0;background:none;border-radius:6px;color:var(--muted)}
+.reveal:hover:not(:disabled){background:#edf4f0;color:var(--green)}
+.eye-slash{display:none}
+.reveal[aria-pressed=true] .eye-slash{display:block}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #cbdcd4;background:white;padding:10px 13px;min-height:40px;border-radius:9px;font-size:13px;font-weight:700}
+.button:hover:not(:disabled){background:#f0f7f3}
+.button.primary{background:var(--green);border-color:var(--green);color:white}
+.button.primary:hover:not(:disabled){background:var(--green-hover)}
+.button .icon{width:17px;height:17px}
+.button:disabled{opacity:.62}
+.full{width:100%;margin-top:14px;justify-content:space-between;min-height:47px;padding-inline:14px}
+.loader{display:inline-block;border:2px solid #ffffff7a;border-top-color:white;width:16px;height:16px;border-radius:50%;animation:spin .72s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.notice{padding:9px 11px;margin-top:10px;color:var(--error);background:var(--error-bg);font-size:13px;border:1px solid #eed3da;border-radius:8px}
+.notice[data-tone=warning]{color:var(--warning);background:var(--warning-bg);border-color:#f1dfbc}
+.notice[data-tone=success]{color:var(--green);background:#edf7f2;border-color:#cde8db}
+.demo-actions{margin-top:17px;padding-top:13px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:7px 15px;align-items:baseline}
+.text-button{border:0;background:none;padding:3px 0;color:var(--green);text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:730}
+.ejected{font-size:12px;color:var(--muted)}
+.signed-summary{display:grid;gap:12px;margin-block:20px}
+.signed-summary div{padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:#f8fbfa;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.signed-summary span{color:var(--muted)}
+.actions-inline{display:flex;flex-wrap:wrap;gap:8px}
+.sandbox{margin-top:13px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px 17px;box-shadow:none;border-radius:14px}
+.sandbox-title{display:flex;gap:9px;align-items:center}
+.sandbox-title .icon{color:var(--green)}
+.sandbox strong{font-size:13px}
+.scenario-actions{display:flex;gap:6px;flex-wrap:wrap}
+.scenario-actions button{min-height:37px;padding:6px 10px;background:#f8fbfa}
+.scenario-actions button[aria-pressed=true]{color:var(--green);background:#e7f4ed;border-color:#bcded1}
+.panel-header{padding:32px 35px 20px}
+.panel-header .label{margin-bottom:8px}
+.arch-inner,.brand-inner{padding:3px 35px 31px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:21px}
+.toolbar .button,.arch-node{min-height:42px}
+.arch-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;list-style:none;padding:0}
+.arch-flow li{position:relative;min-width:0}
+.arch-flow li:not(:last-child)::after{content:"→";color:#77938b;font-size:17px;position:absolute;top:53px;right:-14px;z-index:1;pointer-events:none}
+.arch-node{width:100%;height:100%;min-height:137px;text-align:left;border:1px solid var(--border);background:#f6faf8;border-radius:11px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px}
+.arch-node .icon{color:var(--green);margin-bottom:5px}
+.arch-node strong{font-size:15px;line-height:1.2}
+.arch-node small{color:var(--muted);line-height:1.3}
+.arch-node[aria-pressed=true]{border-color:#388b70;background:#eaf7f0;box-shadow:0 0 0 2px #174e3a0b}
+.arch-node[data-result=reject]{background:#fff4f5;border-color:#d48696}
+.arch-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
+.arch-box{background:#f7faf9;border:1px solid var(--border);border-radius:11px;padding:15px 16px;min-height:115px}
+.arch-box h3{font-size:16px;margin-bottom:5px}
+.arch-box p,.arch-box li{font-size:13px;color:var(--muted);line-height:1.55}
+.arch-box ol{padding-left:18px}
+.brand-inner{display:grid;grid-template-columns:1.16fr 1fr;gap:18px}
+.showcase{display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:17px;padding:23px 15px 17px;border:1px solid var(--border);border-radius:12px;background:#f0f8f4}
+.showcase.dark{background:#123d34;color:white}
+.showcase.dark .mark{background:none}
+.showcase .brand{color:inherit;flex-wrap:wrap;justify-content:center}
+.showcase.dark .brand small{color:#d4eee4}
+.showcase .brand strong{font-size:clamp(23px,4.4vw,45px)}
+.showcase .brand small{font-size:clamp(12px,1.6vw,16px)}
+.showcase .mark{width:clamp(45px,8vw,74px);height:clamp(45px,8vw,74px)}
+.showcase .brand-preview{display:grid;place-items:center;min-height:174px}
+.brand-spec{display:grid;gap:11px}
+.swatch{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px}
+.swatch i{background:var(--swatch);width:27px;height:27px;border:1px solid #6d837747;border-radius:6px}
+.swatch code{color:var(--muted);font-family:ui-monospace,monospace}
+.brand-spec p{font-size:13px;color:var(--muted)}
+.foot{margin:15px 1px 0;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:8px 18px;flex-wrap:wrap}
+@media(max-width:910px){.topline,.shell{width:calc(100% - 36px)}.hero{padding:28px 27px 22px}.signin{padding:32px 28px}.panel-header,.arch-inner,.brand-inner{padding-left:23px;padding-right:23px}}
+@media(max-width:680px){
+  .topline{flex-wrap:wrap;gap:8px;min-height:0;padding:11px 0 8px}.tabs{order:3;width:100%;overflow:auto}.tab{padding:7px 10px}
+  .shell{margin-top:15px}.main-grid{grid-template-columns:minmax(0,1fr)}.hero{border-right:0;border-bottom:1px solid var(--border)}
+  .hero h1{font-size:40px}.hero p{margin-top:7px}.building{max-height:155px;margin-top:0}.fig-caption{margin-top:9px}
+  .signin{padding:28px 23px 30px}.sandbox{align-items:flex-start;flex-direction:column;padding:12px}
+  .panel-header{padding-top:24px}.arch-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.arch-flow li::after{display:none}
+  .arch-detail,.brand-inner{grid-template-columns:minmax(0,1fr)}.arch-node{min-height:105px;padding:10px}
+}
+@media(max-width:390px){.topline,.shell{width:calc(100% - 24px)}.hero,.signin{padding-inline:17px}.panel-header,.arch-inner,.brand-inner{padding-inline:15px}.prototype{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <symbol id="brand-mark" viewBox="0 0 48 48">
+    <rect width="48" height="48" rx="12" fill="#08644F"/>
+    <path d="M13 34V14h22v20" fill="none" stroke="white" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M11.5 25h7l3.5-6 4.25 10 2.9-4h7.35" fill="none" stroke="#A1E5CC" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4m-4 4v2"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+  <symbol id="server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01m3-10h6m-6 10h6"/></symbol>
+  <symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M10 9v12"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol>
+  <symbol id="flask" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v7L5 18a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3M8 14h8"/></symbol>
+  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></symbol>
+</defs>
+</svg>
+<header class="header">
+  <div class="topline">
+    <div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#brand-mark"/></svg><div><strong>Poliklinika</strong><small>Rahbar nazorati</small></div></div>
+    <nav class="tabs" role="tablist" aria-label="Prototip bo‘limlari">
+      <button class="tab" type="button" id="tab-login" role="tab" aria-controls="view-login" aria-selected="true">Kirish</button>
+      <button class="tab" type="button" id="tab-architecture" role="tab" aria-controls="view-architecture" aria-selected="false" tabindex="-1">Arxitektura</button>
+      <button class="tab" type="button" id="tab-brand" role="tab" aria-controls="view-brand" aria-selected="false" tabindex="-1">Brend</button>
+    </nav>
+    <span class="prototype">Interaktiv prototip</span>
+  </div>
+</header>
+<main class="shell">
+  <div id="view-login" role="tabpanel" aria-labelledby="tab-login">
+    <div class="panel main-grid">
+      <section class="hero" aria-labelledby="hero-title">
+        <span class="label">Poliklinika boshqaruvi</span>
+        <h1 id="hero-title">Rahbar paneli</h1>
+        <p>Davomat, kirish-chiqish qaydlari va bino bo‘ylab harakat.</p>
+        <svg class="building" viewBox="0 0 520 312" role="img" aria-labelledby="building-title" xmlns="http://www.w3.org/2000/svg">
+          <title id="building-title">Poliklinikaning uch qavati va ular orasidagi yo‘lning shartli chizmasi</title>
+          <defs>
+            <linearGradient id="deck" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#def2e9"/></linearGradient>
+            <g id="blueprint">
+              <path d="M12 71 254 98 390 31 390 42 254 110 12 82Z" fill="#a9d0c2" stroke="#5c9c8b" stroke-width="1"/>
+              <path d="M254 98 390 31 390 42 254 110Z" fill="#cbe6db" stroke="#5c9c8b" stroke-width="1"/>
+              <path d="M12 71 148 5 390 31 254 98Z" fill="url(#deck)" stroke="#4e9181" stroke-width="1.25"/>
+              <g fill="none" stroke="#76aa9f" stroke-width="1">
+                <path d="m35 61 224 23 97-48-224-24M58 50l224 24M82 38l224 25M109 24l223 25"/>
+                <path d="m70 75 115-56M112 80l115-56m-69 61 117-57m-75 61L317 32m-71 62 116-57"/>
+                <path d="m80 40 55-28 40 5-57 27Zm172 33 54-27 37 4-55 27Z" fill="#d0ebdf"/>
+              </g>
+            </g>
+          </defs>
+          <path d="m29 263 140-70 286 35-143 74Z" fill="#86bba83b"/>
+          <g class="storey" style="--delay:.26s"><use href="#blueprint" x="50" y="183"/></g>
+          <g class="storey" style="--delay:.14s"><use href="#blueprint" x="50" y="112"/></g>
+          <g class="storey" style="--delay:0s"><use href="#blueprint" x="50" y="41"/></g>
+          <g fill="none" stroke="#19725d" stroke-width="2.2" stroke-linecap="round">
+            <path class="route" d="m137 110 101-50 103 12-72 36 1 72 71 10-2 66-101-11-55 28"/>
+          </g>
+          <g fill="#0c6956" stroke="#fff" stroke-width="2"><circle cx="137" cy="110" r="5"/><circle cx="269" cy="108" r="5"/><circle cx="270" cy="180" r="5"/><circle cx="339" cy="256" r="5"/><circle cx="183" cy="273" r="5"/></g>
+          <circle class="beacon" cx="137" cy="110" r="13" fill="none" stroke="#0d735b" stroke-width="1.5"/>
+          <g stroke="#749c8e" fill="none" stroke-dasharray="3 4"><path d="M408 86h30"/><path d="M408 157h30"/><path d="M408 228h30"/></g>
+          <g font-family="system-ui,sans-serif" font-size="12" fill="#2e5b50" font-weight="650"><text x="442" y="90">3-qavat</text><text x="442" y="161">2-qavat</text><text x="442" y="232">1-qavat</text></g>
+        </svg>
+        <span class="fig-caption"><svg class="icon" aria-hidden="true"><use href="#layers"/></svg> Uch qavatning konseptual chizmasi</span>
+      </section>
+      <section class="signin" aria-label="Kirish va seans">
+        <div class="signin-content">
+          <div id="access-view">
+            <span class="status-icon" aria-hidden="true"><svg class="icon"><use href="#lock"/></svg></span>
+            <h2 id="login-title" tabindex="-1">Tizimga kirish</h2>
+            <p class="subtext">Rahbar panelini ochish uchun login va parolni kiriting.</p>
+            <form id="login-form" novalidate>
+              <label class="field-label" for="username">Login</label>
+              <input id="username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="Namoyish logini" required aria-describedby="demo-hint">
+              <label class="field-label" for="password">Parol</label>
+              <div class="passline">
+                <input id="password" type="password" autocomplete="off" placeholder="Namoyish paroli" maxlength="50" required aria-describedby="demo-hint">
+                <button class="reveal" type="button" id="reveal" aria-pressed="false" aria-label="Parolni ko‘rsatish">
+                  <svg class="icon" aria-hidden="true"><use href="#eye"/><path class="eye-slash" d="m4 4 16 16"/></svg>
+                </button>
+              </div>
+              <p class="notice" id="warning" role="status" aria-live="polite" hidden></p>
+              <button class="button primary full" type="submit" id="submit"><span id="submit-label">Kirish</span><svg class="icon" id="submit-arrow" aria-hidden="true"><use href="#arrow"/></svg><span class="loader" id="loader" aria-hidden="true" hidden></span></button>
+            </form>
+            <div class="demo-actions">
+              <button class="text-button" type="button" id="fill-demo">Demo login va parolni qo‘yish</button>
+              <span id="demo-hint" class="ejected">Login <code>rahbar</code> · parol <code>demo</code></span>
+            </div>
+          </div>
+          <div id="signed-view" hidden>
+            <span class="status-icon" aria-hidden="true"><svg class="icon"><use href="#check"/></svg></span>
+            <h2 id="signed-title" tabindex="-1">Rahbar paneli ochildi</h2>
+            <p class="subtext">Kirish muvaffaqiyatli. Quyida namoyish seansining holati.</p>
+            <div class="signed-summary">
+              <div><span>Rol</span><strong>Rahbar</strong></div>
+              <div><span>Seans</span><strong>Faol</strong></div>
+            </div>
+            <div class="actions-inline">
+              <a href="index.html" class="button primary" id="open-panel">Rahbar paneliga o‘tish →</a>
+              <button class="button" type="button" id="logout">Chiqish</button>
+              <button class="button" type="button" id="expire">Seans tugashini sinash</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <aside class="panel sandbox" aria-label="Kirish ssenariylari">
+      <div class="sandbox-title"><svg class="icon" aria-hidden="true"><use href="#flask"/></svg><strong>Sinov ssenariylari</strong></div>
+      <div class="scenario-actions">
+        <button class="button" type="button" data-scenario="success" aria-pressed="false">Demo ma’lumotlarini to‘ldirish</button>
+        <button class="button" type="button" data-scenario="wrong" aria-pressed="false">Xato login yoki parol</button>
+        <button class="button" type="button" data-scenario="limited" aria-pressed="false">Vaqtincha cheklov</button>
+        <button class="button" type="button" data-scenario="reset" aria-pressed="false">Qayta boshlash</button>
+      </div>
+    </aside>
+  </div>
+  <section class="panel" id="view-architecture" role="tabpanel" aria-labelledby="tab-architecture" hidden>
+    <div class="panel-header">
+      <span class="label">Kirish arxitekturasi</span>
+      <h1>Kirishdan rahbar paneligacha</h1>
+      <p class="subtext">Bosqichni tanlang yoki kirish jarayonini ketma-ket ko‘ring.</p>
+    </div>
+    <div class="arch-inner">
+      <div class="toolbar" aria-label="Arxitektura animatsiyasi">
+        <button class="button primary" type="button" id="play-success">Muvaffaqiyatli kirish</button>
+        <button class="button" type="button" id="play-wrong">Rad etilgan kirish</button>
+      </div>
+      <ol class="arch-flow">
+        <li><button class="arch-node" type="button" data-stage="0" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#lock"/></svg><strong>01 · Kirish shakli</strong><small>Login va parolni yuborish</small></button></li>
+        <li><button class="arch-node" type="button" data-stage="1" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#server"/></svg><strong>02 · Server tekshiruvi</strong><small>Parol xeshi va urinishlar</small></button></li>
+        <li><button class="arch-node" type="button" data-stage="2" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#check"/></svg><strong>03 · Seans yaratish</strong><small>Seans cookie-si</small></button></li>
+        <li><button class="arch-node" type="button" data-stage="3" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#grid"/></svg><strong>04 · Rahbar paneli</strong><small>Faol seans bilan kirish</small></button></li>
+      </ol>
+      <div class="arch-detail">
+        <div class="arch-box" aria-live="polite"><h3 id="stage-title"></h3><p id="stage-copy"></p></div>
+        <div class="arch-box"><h3>Qayd etilgan bosqichlar</h3><ol id="trace"></ol></div>
+      </div>
+    </div>
+  </section>
+  <section class="panel" id="view-brand" role="tabpanel" aria-labelledby="tab-brand" hidden>
+    <div class="panel-header">
+      <span class="label">Logo va ranglar</span>
+      <h1>Poliklinika brendi</h1>
+      <p class="subtext">Kirish eshigi va puls chizig‘i bitta belgida birlashgan.</p>
+    </div>
+    <div class="brand-inner">
+      <div class="showcase" id="showcase">
+        <div class="brand-preview"><div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#brand-mark"/></svg><div><strong>Poliklinika</strong><small>Rahbar nazorati</small></div></div></div>
+        <div class="actions-inline">
+          <button class="button" type="button" id="switch-background" aria-pressed="false">To‘q fonda ko‘rish</button>
+          <button class="button" type="button" id="logo-download"><svg class="icon" aria-hidden="true"><use href="#download"/></svg> SVG belgi</button>
+        </div>
+      </div>
+      <div class="brand-spec">
+        <div class="swatch" style="--swatch:#08644F"><i aria-hidden="true"></i><strong>Asosiy yashil</strong><code>#08644F</code></div>
+        <div class="swatch" style="--swatch:#A1E5CC"><i aria-hidden="true"></i><strong>Yorqin yalpiz</strong><code>#A1E5CC</code></div>
+        <div class="swatch" style="--swatch:#162A29"><i aria-hidden="true"></i><strong>Asosiy matn</strong><code>#162A29</code></div>
+        <div class="swatch" style="--swatch:#F3F6F5"><i aria-hidden="true"></i><strong>Ochiq fon</strong><code>#F3F6F5</code></div>
+        <p>Belgi kichik ekranda alohida qo‘llanadi. To‘liq yozuv tizim nomi va panel vazifasini ko‘rsatadi.</p>
+      </div>
+    </div>
+  </section>
+  <footer class="foot"><span>Interaktiv namoyish · Shaxsiy ma’lumotlar ishlatilmagan.</span><span>Autentifikatsiya jarayoni brauzerda simulyatsiya qilinadi.</span></footer>
+</main>
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+const scenarioButtons = Array.from(document.querySelectorAll('[data-scenario]'));
+const stageButtons = Array.from(document.querySelectorAll('[data-stage]'));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const demoUsername = 'rahbar';
+const demoPassword = 'demo';
+const maximumAttempts = 5;
+
+let attempts = 0;
+let pendingLogin = null;
+let pendingFlow = null;
+
+function showTab(index, focus = false) {
+  for (const [position, tab] of tabs.entries()) {
+    const active = index === position;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+    $(tab.getAttribute('aria-controls')).hidden = !active;
+  }
+  if (index !== 1) {
+    clearTimeout(pendingFlow);
+    pendingFlow = null;
+  }
+  if (focus) tabs[index].focus();
+}
+
+for (const [index, tab] of tabs.entries()) {
+  tab.addEventListener('click', () => showTab(index));
+  tab.addEventListener('keydown', event => {
+    const targets = {
+      ArrowRight: (index + 1) % tabs.length,
+      ArrowLeft: (index + tabs.length - 1) % tabs.length,
+      Home: 0,
+      End: tabs.length - 1,
+    };
+    const target = targets[event.key];
+    if (target === undefined) return;
+    event.preventDefault();
+    showTab(target, true);
+  });
+}
+
+const username = $('username');
+const input = $('password');
+const warning = $('warning');
+const reveal = $('reveal');
+
+function hidePassword(hidden) {
+  input.type = hidden ? 'password' : 'text';
+  reveal.setAttribute('aria-pressed', String(!hidden));
+  reveal.setAttribute('aria-label', hidden ? 'Parolni ko‘rsatish' : 'Parolni yashirish');
+}
+
+function message(text = '', tone = 'error', affected = [username, input]) {
+  warning.hidden = !text;
+  warning.textContent = text;
+  warning.dataset.tone = tone;
+  for (const field of [username, input]) {
+    const invalid = Boolean(text) && tone === 'error' && affected.includes(field);
+    field.setAttribute('aria-invalid', String(invalid));
+    field.setAttribute('aria-describedby', invalid ? 'warning demo-hint' : 'demo-hint');
+  }
+}
+
+function controls(mode = 'ready') {
+  const busy = mode === 'busy';
+  const disabled = busy || mode === 'limited';
+  for (const button of [username, input, reveal, $('fill-demo'), $('submit')]) button.disabled = disabled;
+  $('submit-label').textContent = busy ? 'Tekshirilmoqda…' : mode === 'limited' ? 'Kirish vaqtincha cheklangan' : 'Kirish';
+  $('submit-arrow').hidden = busy || disabled;
+  $('loader').hidden = !busy;
+  $('login-form').setAttribute('aria-busy', String(busy));
+}
+
+function chooseScenario(value = '') {
+  for (const button of scenarioButtons) button.setAttribute('aria-pressed', String(button.dataset.scenario === value));
+}
+
+function showAccess() {
+  $('access-view').hidden = false;
+  $('signed-view').hidden = true;
+}
+
+function clearLogin() {
+  clearTimeout(pendingLogin);
+  pendingLogin = null;
+  attempts = 0;
+  showAccess();
+  controls();
+  message();
+  username.value = '';
+  input.value = '';
+  hidePassword(true);
+}
+
+function showLimit() {
+  input.value = '';
+  controls('limited');
+  chooseScenario('limited');
+  message('5 ta xato urinishdan keyin kirish vaqtincha cheklanadi. Demoni davom ettirish uchun «Qayta boshlash»ni bosing.', 'warning');
+}
+
+function verifyDemo(login, password, origin = 'input') {
+  if (pendingLogin !== null || attempts >= maximumAttempts) return;
+  const missing = [!login && username, !password && input].filter(Boolean);
+  if (missing.length) {
+    const notice = missing.length === 2 ? 'Login va parolni kiriting.'
+      : missing[0] === username ? 'Loginni kiriting.' : 'Parolni kiriting.';
+    message(notice, 'error', missing);
+    missing[0].focus();
+    return;
+  }
+  message();
+  hidePassword(true);
+  controls('busy');
+  pendingLogin = setTimeout(() => {
+    pendingLogin = null;
+    controls();
+    if (login === demoUsername && password === demoPassword) {
+      attempts = 0;
+      username.value = '';
+      input.value = '';
+      $('access-view').hidden = true;
+      $('signed-view').hidden = false;
+      $('signed-title').focus();
+      return;
+    }
+    attempts++;
+    if (attempts >= maximumAttempts) {
+      showLimit();
+      const reset = scenarioButtons.find(button => button.dataset.scenario === 'reset');
+      reset.focus();
+      return;
+    }
+    input.value = '';
+    message('Login yoki parol xato. Qayta urinib ko‘ring.');
+    if (origin === 'input') input.focus();
+  }, reduceMotion.matches ? 20 : 720);
+}
+
+$('login-form').addEventListener('submit', event => {
+  event.preventDefault();
+  chooseScenario();
+  verifyDemo(username.value.trim(), input.value);
+});
+reveal.addEventListener('click', () => hidePassword(input.type !== 'password'));
+function fillDemo() {
+  username.value = demoUsername;
+  input.value = demoPassword;
+  message();
+  $('submit').focus();
+}
+
+$('fill-demo').addEventListener('click', fillDemo);
+for (const field of [username, input]) field.addEventListener('input', () => message());
+
+for (const button of scenarioButtons) {
+  button.addEventListener('click', () => {
+    const scenario = button.dataset.scenario;
+    clearLogin();
+    chooseScenario(scenario);
+    if (scenario === 'reset') {
+      username.focus();
+      return;
+    }
+    if (scenario === 'success') {
+      fillDemo();
+      return;
+    }
+    if (scenario === 'limited') {
+      attempts = maximumAttempts;
+      showLimit();
+      return;
+    }
+    verifyDemo('xato-login', 'namuna-xato', 'scenario');
+  });
+}
+
+function backToLogin(text, tone) {
+  clearLogin();
+  chooseScenario();
+  message(text, tone);
+  $('login-title').focus();
+}
+
+$('logout').addEventListener('click', () => backToLogin('Seans yakunlandi.', 'success'));
+$('expire').addEventListener('click', () => backToLogin('Seans muddati tugadi. Davom etish uchun qayta kiring.', 'warning'));
+
+const stages = [
+  { title: 'Kirish shakli', copy: 'Jonli dastur login va parolni HTTPS orqali serverga yuboradi. Bu namoyishda yuborish brauzer ichida simulyatsiya qilinadi.' },
+  { title: 'Server tekshiruvi', copy: 'Server loginni va parol xeshini tekshiradi hamda xato urinishlar sonini kuzatadi.' },
+  { title: 'Seans yaratish', copy: 'Login va parol to‘g‘ri bo‘lsa, server seans yaratadi. Jonli HTTPS muhitida cookie HttpOnly va Secure atributlariga ega bo‘ladi.' },
+  { title: 'Rahbar paneli', copy: 'Server faqat faol seans bilan panelni ochadi. Chiqish bosilganda yoki seans muddati tugaganda qayta kirish talab qilinadi.' },
+];
+
+function addTrace(text) {
+  const item = document.createElement('li');
+  item.textContent = text;
+  $('trace').append(item);
+}
+
+function stage(index, reject = false) {
+  for (const [position, button] of stageButtons.entries()) {
+    button.setAttribute('aria-pressed', String(position === index));
+    button.dataset.result = position === index && reject ? 'reject' : '';
+  }
+  $('stage-title').textContent = reject ? 'Kirish rad etildi' : stages[index].title;
+  $('stage-copy').textContent = reject
+    ? 'Server kirishni rad etadi. Seans yaratilmaydi va panel yopiq qoladi.'
+    : stages[index].copy;
+}
+
+function playFlow(reject) {
+  clearTimeout(pendingFlow);
+  $('trace').replaceChildren();
+  let index = 0;
+  const last = reject ? 1 : stages.length - 1;
+  const tick = () => {
+    const rejected = reject && index === last;
+    stage(index, rejected);
+    addTrace(rejected ? 'Kirish rad etildi' : stages[index].title);
+    if (index++ < last) pendingFlow = setTimeout(tick, reduceMotion.matches ? 80 : 900);
+    else pendingFlow = null;
+  };
+  tick();
+}
+
+for (const [index, button] of stageButtons.entries()) {
+  button.addEventListener('click', () => {
+    clearTimeout(pendingFlow);
+    pendingFlow = null;
+    stage(index);
+    $('trace').replaceChildren();
+    addTrace(stages[index].title);
+  });
+}
+
+$('play-success').addEventListener('click', () => playFlow(false));
+$('play-wrong').addEventListener('click', () => playFlow(true));
+
+$('switch-background').addEventListener('click', event => {
+  const dark = $('showcase').classList.toggle('dark');
+  event.currentTarget.setAttribute('aria-pressed', String(dark));
+  event.currentTarget.textContent = dark ? 'Ochiq fonda ko‘rish' : 'To‘q fonda ko‘rish';
+});
+
+$('logo-download').addEventListener('click', () => {
+  const mark = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48"><title>Poliklinika</title>'
+    + $('brand-mark').innerHTML + '</svg>';
+  const url = URL.createObjectURL(new Blob([mark], { type: 'image/svg+xml' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'Poliklinika_belgisi.svg';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+stage(0);
+addTrace(stages[0].title);
+</script>
+</body>
+</html>
