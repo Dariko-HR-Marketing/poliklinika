@@ -21,105 +21,438 @@ if (sessionStorage.getItem('poliklinika_auth') === 'true') {
 <title>Poliklinika · Rahbar nazorati tizimiga kirish</title>
 <style>
 :root{
-  --page:#F0F4F8;--paper:#FFFFFF;--ink:#0F1F2C;--muted:#536B7E;--deep:#06352B;
-  --green:#007A5E;--green-hover:#00624B;--mint:#E1F5EC;--teal:#0D9488;--cyan:#0284C7;
-  --border:#D3E0EA;--border-subtle:#E5EDF4;--error:#B91C1C;--error-bg:#FEF2F2;
-  --warning:#B45309;--warning-bg:#FFFBEB;--radius:20px;--shadow:0 20px 60px rgba(15,31,44,0.08);
-  font:15px/1.45 Geist,Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--page);
+  --page-bg:#F4F7F9;
+  --paper:#FFFFFF;
+  --ink:#0F1F2C;
+  --muted:#5A6F7F;
+  --brand-green:#059669;
+  --brand-green-hover:#047857;
+  --mint-bg:#F0FDF8;
+  --mint-surface:#E6F7F0;
+  --mint-border:#D1EBE1;
+  --card-border:#DEE7EE;
+  --error:#B91C1C;
+  --error-bg:#FEF2F2;
+  --warning:#B45309;
+  --warning-bg:#FFFBEB;
+  --radius:22px;
+  font:15px/1.45 Geist,Inter,"Segoe UI",system-ui,sans-serif;
+  color:var(--ink);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;min-width:320px;background:linear-gradient(135deg,#EEF4F8 0%,#E3EDF5 100%);min-height:100vh;display:flex;flex-direction:column}
+body{
+  margin:0;
+  min-width:320px;
+  min-height:100vh;
+  background-color:var(--page-bg);
+  color:var(--ink);
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow-x:hidden;
+}
 h1,h2,h3,p{margin:0}
 button,input,a{font:inherit}
 button,a{cursor:pointer;color:inherit;text-decoration:none}
 button:disabled{cursor:not-allowed}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--brand-green);outline-offset:3px}
 .icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
+/* Ambient Animated Background Orbs */
+.bg-ambient-canvas{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.ambient-orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(85px);
+  opacity:0.65;
+  will-change:transform;
+}
+.orb-1{
+  width:540px;
+  height:540px;
+  background:radial-gradient(circle,rgba(167,243,208,0.7) 0%,rgba(167,243,208,0.2) 65%,transparent 80%);
+  top:-120px;
+  left:-80px;
+  animation:orb-float-1 20s ease-in-out infinite alternate;
+}
+.orb-2{
+  width:580px;
+  height:580px;
+  background:radial-gradient(circle,rgba(226,232,240,0.85) 0%,rgba(203,213,225,0.3) 65%,transparent 80%);
+  bottom:-140px;
+  right:-100px;
+  animation:orb-float-2 24s ease-in-out infinite alternate;
+}
+.orb-3{
+  width:440px;
+  height:440px;
+  background:radial-gradient(circle,rgba(204,251,241,0.65) 0%,rgba(153,246,228,0.25) 60%,transparent 80%);
+  top:30%;
+  left:55%;
+  animation:orb-float-3 18s ease-in-out infinite alternate;
+}
+@keyframes orb-float-1{
+  0%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(130px,90px) scale(1.1);}
+  100%{transform:translate(50px,180px) scale(0.95);}
+}
+@keyframes orb-float-2{
+  0%{transform:translate(0,0) scale(1);}
+  50%{transform:translate(-120px,-90px) scale(1.12);}
+  100%{transform:translate(-40px,-160px) scale(0.9);}
+}
+@keyframes orb-float-3{
+  0%{transform:translate(-50%,-50%) scale(0.92);}
+  50%{transform:translate(-38%,-65%) scale(1.16);}
+  100%{transform:translate(-62%,-35%) scale(1);}
+}
+
 /* Header */
-.header{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
-.topline{width:min(calc(100% - 48px),1280px);margin-inline:auto;display:flex;min-height:70px;align-items:center;justify-content:space-between;gap:18px}
+.header{
+  position:relative;
+  z-index:10;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(216,228,236,0.7);
+}
+.topline{
+  width:min(calc(100% - 48px),1240px);
+  margin-inline:auto;
+  display:flex;
+  min-height:68px;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
 .brand{display:flex;align-items:center;gap:12px;color:var(--ink)}
-.brand strong{display:block;line-height:1.15;font-size:18px;font-weight:750;letter-spacing:-.03em;color:#0B231E}
-.brand small{font-size:11px;color:var(--muted);font-weight:550;letter-spacing:.02em}
-.mark{width:42px;height:42px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,122,94,0.22))}
-.sys-status{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:650;color:#007A5E;background:#E1F5EC;padding:6px 14px;border-radius:30px;border:1px solid #BFE7D5}
-.pulse-dot{width:8px;height:8px;border-radius:50%;background:#007A5E;box-shadow:0 0 0 0 rgba(0,122,94,0.7);animation:pulse-ring 1.8s infinite}
-@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(0,122,94,0.7)}70%{box-shadow:0 0 0 9px rgba(0,122,94,0)}100%{box-shadow:0 0 0 0 rgba(0,122,94,0)}}
+.brand strong{display:block;line-height:1.15;font-size:18px;font-weight:750;letter-spacing:-.03em;color:#0F2A24}
+.brand small{font-size:11px;color:var(--muted);font-weight:550}
+.mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 3px 8px rgba(5,150,105,0.18))}
+.sys-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:650;
+  color:#065F46;
+  background:#E6F7F0;
+  padding:6px 14px;
+  border-radius:30px;
+  border:1px solid #C4EBDD;
+}
+.pulse-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#059669;
+  box-shadow:0 0 0 0 rgba(5,150,105,0.7);
+  animation:pulse-ring 1.8s infinite;
+}
+@keyframes pulse-ring{
+  0%{box-shadow:0 0 0 0 rgba(5,150,105,0.7)}
+  70%{box-shadow:0 0 0 9px rgba(5,150,105,0)}
+  100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}
+}
 
-/* Layout */
-.shell{width:min(calc(100% - 48px),1280px);margin:32px auto 40px;flex:1;display:grid;place-items:center}
-.main-card{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:var(--paper);overflow:hidden;box-shadow:var(--shadow);display:grid;grid-template-columns:1.25fr 1fr;min-height:640px}
+/* Shell / Container */
+.shell{
+  position:relative;
+  z-index:2;
+  width:min(calc(100% - 48px),1240px);
+  margin:38px auto 46px;
+  flex:1;
+  display:grid;
+  place-items:center;
+}
 
-/* Left Hero / Medical Infographics */
-.hero{position:relative;background:linear-gradient(150deg,#072E27 0%,#0A3E34 45%,#0F4A3F 100%);color:#FFFFFF;padding:42px 46px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;isolation:isolate}
-.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(13,148,136,0.25) 0%,transparent 60%),radial-gradient(circle at 10% 80%,rgba(0,122,94,0.3) 0%,transparent 50%);z-index:-1}
+/* Main Card */
+.main-card{
+  width:100%;
+  border:1px solid rgba(220,232,240,0.85);
+  border-radius:var(--radius);
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  overflow:hidden;
+  box-shadow:0 24px 64px -14px rgba(15,31,44,0.08),0 2px 6px rgba(0,0,0,0.02);
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  min-height:560px;
+}
 
-/* ECG Line Animation */
-.ecg-wrap{position:relative;width:100%;margin:16px 0 20px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;backdrop-filter:blur(8px)}
-.ecg-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.08em;color:#94D8C5;text-transform:uppercase;margin-bottom:6px}
+/* Left Hero: Minimalist Light Mint & Sage Aesthetic */
+.hero{
+  position:relative;
+  background:linear-gradient(155deg,#F5FAF8 0%,#EAF5F0 50%,#DFEFE8 100%);
+  color:#133930;
+  padding:44px 44px 40px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  border-right:1px solid #D6E8E0;
+}
+
+.badge-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  background:#D4ECE1;
+  border:1px solid #BFE0D1;
+  color:#065F46;
+  font-size:11px;
+  font-weight:750;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:5px 12px;
+  border-radius:20px;
+}
+.hero h1{
+  font-size:clamp(30px,3.4vw,44px);
+  font-weight:800;
+  line-height:1.12;
+  letter-spacing:-.04em;
+  margin-top:14px;
+  color:#0D2E26;
+}
+.hero h1 span{
+  color:#059669;
+}
+.hero-sub{
+  color:#46655B;
+  font-size:14px;
+  margin-top:10px;
+  line-height:1.55;
+  max-width:44ch;
+}
+
+/* Medical ECG Card */
+.ecg-card{
+  margin:24px 0 20px;
+  padding:14px 16px;
+  background:#FFFFFF;
+  border:1px solid #CCE5DB;
+  border-radius:14px;
+  box-shadow:0 4px 18px rgba(5,150,105,0.05);
+}
+.ecg-topline{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.07em;
+  color:#047857;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.ecg-bpm{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#059669;
+  font-weight:800;
+}
+.bpm-pulse{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#059669;
+  animation:pulse-ring 1.5s infinite;
+}
 .ecg-svg{width:100%;height:44px;display:block;overflow:visible}
-.ecg-base{stroke:rgba(255,255,255,0.15);stroke-width:1.5;fill:none}
-.ecg-pulse{stroke:#2DD4BF;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:160 400;animation:ecg-flow 2.8s linear infinite;filter:drop-shadow(0 0 6px #2DD4BF)}
+.ecg-track{stroke:#E2E8F0;stroke-width:1.5;fill:none}
+.ecg-active{
+  stroke:#059669;
+  stroke-width:2.5;
+  fill:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-dasharray:160 400;
+  animation:ecg-flow 2.6s linear infinite;
+  filter:drop-shadow(0 0 4px rgba(5,150,105,0.45));
+}
 @keyframes ecg-flow{from{stroke-dashoffset:560}to{stroke-dashoffset:0}}
 
-/* Hero Header */
-.badge-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(45,212,191,0.15);border:1px solid rgba(45,212,191,0.35);color:#5EEAD4;font-size:11px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;padding:5px 12px;border-radius:20px}
-.hero h1{font-size:clamp(32px,3.8vw,48px);font-weight:800;line-height:1.08;letter-spacing:-.045em;margin-top:14px}
-.hero h1 span{background:linear-gradient(90deg,#FFFFFF 30%,#A7F3D0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-sub{color:#B8D5CD;font-size:14px;margin-top:10px;line-height:1.5;max-width:44ch}
+/* Minimalist Stat Cards Grid */
+.stats-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:16px;
+}
+.stat-card{
+  background:#FFFFFF;
+  border:1px solid #D4E8DF;
+  border-radius:13px;
+  padding:13px 15px;
+  box-shadow:0 3px 12px rgba(6,95,70,0.04);
+  transition:all .2s ease;
+}
+.stat-card:hover{
+  border-color:#A3D7C3;
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(6,95,70,0.08);
+}
+.stat-val{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:#065F46;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.stat-val small{font-size:13px;color:#059669;font-weight:650}
+.stat-label{font-size:11px;color:#506E63;font-weight:600;margin-top:3px}
 
-/* Medical Infographic Stats Grid */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 16px}
-.stat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;backdrop-filter:blur(6px);transition:all .2s ease}
-.stat-card:hover{background:rgba(255,255,255,0.12);border-color:rgba(45,212,191,0.4);transform:translateY(-2px)}
-.stat-val{font-size:24px;font-weight:800;letter-spacing:-.03em;color:#FFFFFF;display:flex;align-items:center;gap:6px}
-.stat-val small{font-size:13px;color:#5EEAD4;font-weight:600}
-.stat-label{font-size:11px;color:#A9C9C0;font-weight:600;margin-top:3px}
+/* Feature Badges */
+.feature-pills{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:auto;
+  padding-top:14px;
+  border-top:1px solid #D6E8DF;
+}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:#FFFFFF;
+  border:1px solid #CFE6DC;
+  border-radius:20px;
+  padding:5px 11px;
+  font-size:11px;
+  font-weight:650;
+  color:#134E4A;
+}
 
-/* Interactive 3D Building Floor Visual */
-.isometric-view{position:relative;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px;margin-top:auto}
-.iso-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#A9C9C0;font-weight:650;margin-bottom:8px}
-.building-svg{width:100%;height:auto;max-height:165px;display:block}
-.storey-box{transition:all .3s ease;cursor:pointer}
-.storey-box:hover{filter:brightness(1.2)}
-.beacon-pulse{transform-box:fill-box;transform-origin:center;animation:pulse-beacon 2s infinite ease-out}
-@keyframes pulse-beacon{0%{opacity:.85;transform:scale(.7)}100%{opacity:0;transform:scale(2.2)}}
-
-/* Right Sign-in Form */
-.signin{display:flex;flex-direction:column;justify-content:center;padding:48px 52px;background:var(--paper);min-width:0}
-.signin-inner{width:100%;max-width:390px;margin-inline:auto}
-.signin-badge{display:grid;place-items:center;width:50px;height:50px;border-radius:14px;background:#E1F5EC;color:var(--green);border:1px solid #BFE7D5;margin-bottom:18px;box-shadow:0 6px 16px rgba(0,122,94,0.1)}
-.signin h2{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.1;color:#0F1F2C}
+/* Right Sign-in Column */
+.signin{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:48px 52px;
+  background:#FFFFFF;
+  min-width:0;
+}
+.signin-inner{width:100%;max-width:380px;margin-inline:auto}
+.signin-badge{
+  display:grid;
+  place-items:center;
+  width:48px;
+  height:48px;
+  border-radius:14px;
+  background:#E6F7F0;
+  color:#059669;
+  border:1px solid #C5EADD;
+  margin-bottom:18px;
+  box-shadow:0 4px 12px rgba(5,150,105,0.08);
+}
+.signin h2{font-size:30px;font-weight:800;letter-spacing:-.035em;line-height:1.1;color:#0F1F2C}
 .signin-sub{color:var(--muted);font-size:14px;margin-top:8px;line-height:1.45}
 
-/* Form inputs */
-form{margin-top:28px}
-.field-group{margin-bottom:18px}
+/* Form */
+form{margin-top:26px}
+.field-group{margin-bottom:17px}
 .field-label{display:block;margin-bottom:7px;font-size:13px;font-weight:700;color:#182C45}
 .input-wrap{position:relative;display:flex;align-items:center}
 .input-icon{position:absolute;left:14px;color:#78909C;pointer-events:none}
-input{width:100%;height:52px;border:1px solid #C4D5E2;border-radius:11px;background:#F9FBFC;padding:0 46px 0 44px;color:var(--ink);font-size:14px;font-weight:550;transition:all .18s ease}
-input:hover{border-color:#A3BED2}
-input:focus{background:#FFFFFF;border-color:var(--green);box-shadow:0 0 0 4px rgba(0,122,94,0.12);outline:none}
-input::placeholder{color:#8A9BA8;font-weight:450}
+input{
+  width:100%;
+  height:50px;
+  border:1px solid #CBD7E2;
+  border-radius:11px;
+  background:#FAFCFD;
+  padding:0 44px 0 44px;
+  color:var(--ink);
+  font-size:14px;
+  font-weight:550;
+  transition:all .18s ease;
+}
+input:hover{border-color:#A8BDCE}
+input:focus{
+  background:#FFFFFF;
+  border-color:var(--brand-green);
+  box-shadow:0 0 0 4px rgba(5,150,105,0.12);
+  outline:none;
+}
+input::placeholder{color:#90A1AF;font-weight:450}
 input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
 
-.reveal-btn{position:absolute;right:8px;display:grid;place-items:center;width:36px;height:36px;border:0;background:transparent;border-radius:8px;color:#78909C;transition:all .15s}
-.reveal-btn:hover{background:#EEF3F7;color:var(--green)}
+.reveal-btn{
+  position:absolute;
+  right:7px;
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border:0;
+  background:transparent;
+  border-radius:8px;
+  color:#78909C;
+  transition:all .15s;
+}
+.reveal-btn:hover{background:#EEF4F8;color:var(--brand-green)}
 .eye-slash{display:none}
 .reveal-btn[aria-pressed=true] .eye-slash{display:block}
 
 /* Action button */
-.btn-submit{width:100%;height:52px;background:linear-gradient(135deg,#007A5E 0%,#00624B 100%);color:#FFFFFF;border:0;border-radius:11px;font-size:15px;font-weight:750;letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 24px rgba(0,122,94,0.25);margin-top:14px;transition:all .18s ease}
-.btn-submit:hover:not(:disabled){background:linear-gradient(135deg,#008B6B 0%,#006E54 100%);transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,122,94,0.32)}
+.btn-submit{
+  width:100%;
+  height:50px;
+  background:linear-gradient(135deg,#059669 0%,#047857 100%);
+  color:#FFFFFF;
+  border:0;
+  border-radius:11px;
+  font-size:15px;
+  font-weight:750;
+  letter-spacing:.01em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 8px 22px rgba(5,150,105,0.24);
+  margin-top:16px;
+  transition:all .18s ease;
+}
+.btn-submit:hover:not(:disabled){
+  background:linear-gradient(135deg,#047857 0%,#065F46 100%);
+  transform:translateY(-1px);
+  box-shadow:0 12px 26px rgba(5,150,105,0.3);
+}
 .btn-submit:active:not(:disabled){transform:translateY(0)}
 .btn-submit:disabled{opacity:.65;cursor:not-allowed}
-.loader{display:inline-block;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#FFFFFF;width:18px;height:18px;border-radius:50%;animation:spin .7s linear infinite}
+.loader{
+  display:inline-block;
+  border:2.5px solid rgba(255,255,255,0.3);
+  border-top-color:#FFFFFF;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.notice{padding:11px 14px;margin-top:14px;color:var(--error);background:var(--error-bg);font-size:13px;font-weight:600;border:1px solid #FECACA;border-radius:9px;line-height:1.4}
+.notice{
+  padding:11px 14px;
+  margin-top:14px;
+  color:var(--error);
+  background:var(--error-bg);
+  font-size:13px;
+  font-weight:600;
+  border:1px solid #FECACA;
+  border-radius:9px;
+  line-height:1.4;
+}
 .notice[data-tone=warning]{color:var(--warning);background:var(--warning-bg);border-color:#FDE68A}
 .notice[data-tone=success]{color:#065F46;background:#D1FAE5;border-color:#A7F3D0}
 
@@ -127,30 +460,37 @@ input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
 .signed-card{padding:20px;border:1px solid #BFE7D5;border-radius:14px;background:#F0FDF4;margin-top:10px}
 .signed-card h2{font-size:22px;color:#065F46;font-weight:800}
 .signed-card p{font-size:13px;color:#047857;margin:6px 0 16px}
-.signed-btn{width:100%;height:48px;background:#007A5E;color:#FFFFFF;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:750}
+.signed-btn{width:100%;height:48px;background:var(--brand-green);color:#FFFFFF;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:750}
 
 /* Responsive */
 @media(max-width:960px){
   .main-card{grid-template-columns:1fr;min-height:auto}
-  .hero{padding:32px 28px}
-  .signin{padding:36px 28px}
+  .hero{padding:36px 30px;border-right:0;border-bottom:1px solid #D6E8E0}
+  .signin{padding:38px 30px}
 }
 @media(max-width:480px){
-  .topline,.shell{width:calc(100% - 28px)}
+  .topline,.shell{width:calc(100% - 24px)}
   .stats-grid{grid-template-columns:1fr}
-  .hero h1{font-size:28px}
+  .hero h1{font-size:26px}
 }
 </style>
 </head>
 <body>
 
+<!-- Ambient Animated Background Elements -->
+<div class="bg-ambient-canvas" aria-hidden="true">
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+</div>
+
 <header class="header">
   <div class="topline">
     <div class="brand">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="12" fill="#007A5E"/>
+        <rect width="48" height="48" rx="12" fill="#059669"/>
         <path d="M13 34V14h22v20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M11 25h7l3.5-7 4.5 11 3-5h8" fill="none" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 25h7l3.5-7 4.5 11 3-5h8" fill="none" stroke="#A7F3D0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <div>
         <strong>Poliklinika</strong>
@@ -166,12 +506,12 @@ input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
 
 <main class="shell">
   <div class="main-card">
-    <!-- Left Hero: Medical Animated Infographics -->
+    <!-- Left Hero: Minimalist Medical Infographics -->
     <section class="hero" aria-label="Tibbiy monitoring infografikasi">
       <div>
         <div class="badge-tag">
           <svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
-          Smart Poliklinika Tizimi
+          Smart Poliklinika Nazorati
         </div>
         <h1>
           <span>Rahbar nazorati</span><br>va situatsion tahlil
@@ -181,14 +521,17 @@ input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
         </p>
 
         <!-- Medical Pulse / ECG Graphic -->
-        <div class="ecg-wrap">
-          <div class="ecg-header">
+        <div class="ecg-card">
+          <div class="ecg-topline">
             <span>Kardiogramma va sensorlar oqimi</span>
-            <span style="color:#5EEAD4">Normal · 74 BPM</span>
+            <div class="ecg-bpm">
+              <span class="bpm-pulse"></span>
+              <span>74 BPM · Barqaror</span>
+            </div>
           </div>
           <svg class="ecg-svg" viewBox="0 0 500 50" preserveAspectRatio="none">
-            <path class="ecg-base" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
-            <path class="ecg-pulse" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
+            <path class="ecg-track" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
+            <path class="ecg-active" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
           </svg>
         </div>
 
@@ -213,52 +556,12 @@ input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
         </div>
       </div>
 
-      <!-- Isometric 3D Medical Building Overview -->
-      <div class="isometric-view">
-        <div class="iso-header">
-          <span>Bino arxitekturasi va harakat sxemasi</span>
-          <span style="color:#5EEAD4">3 Qavat · 45 Nuqta</span>
-        </div>
-        <svg class="building-svg" viewBox="0 0 500 210" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#0F766E" stop-opacity="0.15"/>
-            </linearGradient>
-            <g id="floorTemplate">
-              <path d="M20 50 L250 82 L480 30 L250 0 Z" fill="url(#floorGrad)" stroke="#2DD4BF" stroke-width="1.2"/>
-              <line x1="100" y1="40" x2="330" y2="10" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
-              <line x1="170" y1="52" x2="400" y2="20" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
-            </g>
-          </defs>
-
-          <!-- 3rd Floor -->
-          <g class="storey-box" transform="translate(0, 10)">
-            <use href="#floorTemplate"/>
-            <circle cx="250" cy="40" r="4" fill="#34D399"/>
-            <circle class="beacon-pulse" cx="250" cy="40" r="12" fill="none" stroke="#34D399" stroke-width="1.5"/>
-            <text x="430" y="25" fill="#A7F3D0" font-size="11" font-weight="700">3-Qavat (Statsionar)</text>
-          </g>
-
-          <!-- 2nd Floor -->
-          <g class="storey-box" transform="translate(0, 65)">
-            <use href="#floorTemplate"/>
-            <circle cx="180" cy="50" r="4" fill="#38BDF8"/>
-            <circle class="beacon-pulse" cx="180" cy="50" r="12" fill="none" stroke="#38BDF8" stroke-width="1.5"/>
-            <text x="430" y="25" fill="#BAE6FD" font-size="11" font-weight="700">2-Qavat (Diagnostika)</text>
-          </g>
-
-          <!-- 1st Floor -->
-          <g class="storey-box" transform="translate(0, 120)">
-            <use href="#floorTemplate"/>
-            <circle cx="310" cy="45" r="4" fill="#F472B6"/>
-            <circle class="beacon-pulse" cx="310" cy="45" r="12" fill="none" stroke="#F472B6" stroke-width="1.5"/>
-            <text x="430" y="25" fill="#FBCFE8" font-size="11" font-weight="700">1-Qavat (Qabulxona)</text>
-          </g>
-
-          <!-- Route connecting floors -->
-          <path d="M310 165 L250 130 L180 115 L250 50" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
-        </svg>
+      <!-- Feature Badges -->
+      <div class="feature-pills">
+        <span class="pill">🩺 Kardiologiya & Diagnostika</span>
+        <span class="pill">⚡ Real-vaqt monitoringi</span>
+        <span class="pill">🛡️ Xavfsiz Face ID</span>
+        <span class="pill">🏢 3 Qavat to‘liq nazorati</span>
       </div>
     </section>
 
