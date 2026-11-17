@@ -18,332 +18,317 @@ if (sessionStorage.getItem('poliklinika_auth') === 'true') {
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>Poliklinika · Kirish prototipi</title>
+<title>Poliklinika · Rahbar nazorati tizimiga kirish</title>
 <style>
 :root{
-  --page:#f3f6f5;--paper:#fff;--ink:#162a29;--muted:#4f6664;--deep:#103c34;--green:#08644f;
-  --green-hover:#064d3e;--mint:#dff3eb;--border:#d8e5e0;--navy:#1d334d;--error:#982e44;--error-bg:#fff2f4;
-  --warning:#805318;--warning-bg:#fff7ea;
-  font:15px/1.45 Geist,Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--page);font-synthesis:none
+  --page:#F0F4F8;--paper:#FFFFFF;--ink:#0F1F2C;--muted:#536B7E;--deep:#06352B;
+  --green:#007A5E;--green-hover:#00624B;--mint:#E1F5EC;--teal:#0D9488;--cyan:#0284C7;
+  --border:#D3E0EA;--border-subtle:#E5EDF4;--error:#B91C1C;--error-bg:#FEF2F2;
+  --warning:#B45309;--warning-bg:#FFFBEB;--radius:20px;--shadow:0 20px 60px rgba(15,31,44,0.08);
+  font:15px/1.45 Geist,Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--page);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;min-width:320px}
-h1,h2,h3,p,ol{margin:0}
+body{margin:0;min-width:320px;background:linear-gradient(135deg,#EEF4F8 0%,#E3EDF5 100%);min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3,p{margin:0}
 button,input,a{font:inherit}
 button,a{cursor:pointer;color:inherit;text-decoration:none}
 button:disabled{cursor:not-allowed}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--green);outline-offset:3px}
-.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.header{position:relative;background:var(--paper);border-bottom:1px solid var(--border)}
-.topline,.shell{width:min(calc(100% - 64px),1230px);margin-inline:auto}
-.topline{display:flex;min-height:72px;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;align-items:center;gap:11px;color:var(--ink);white-space:nowrap}
-.brand strong{display:block;line-height:1.1;font-size:17px;letter-spacing:-.035em}
-.brand small{font-size:11px;color:var(--muted)}
-.mark{width:41px;height:41px;flex:none}
-.tabs{display:flex;gap:4px;align-items:center}
-.tab{border:1px solid transparent;background:none;padding:8px 14px;border-radius:8px;color:var(--muted);font-size:13px;font-weight:650;white-space:nowrap}
-.tab[aria-selected=true]{background:#e9f4ef;color:var(--green);border-color:#d7eae1}
-.tab:hover:not([aria-selected=true]){background:#f2f6f4}
-.prototype{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:12px;color:var(--muted);font-weight:650}
-.prototype::before{content:"";height:7px;width:7px;border-radius:50%;background:#3b8a72}
-.shell{margin-block:37px 23px}
-.panel{border:1px solid var(--border);border-radius:23px;background:var(--paper);overflow:hidden;box-shadow:0 16px 50px #1f423a0b}
-.main-grid{display:grid;grid-template-columns:1.04fr .96fr;min-height:526px}
-.hero{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:flex-start;overflow:hidden;background:linear-gradient(144deg,#f1f9f5 17%,#d9eee5 100%);padding:36px 42px 26px;border-right:1px solid #d8e9e1}
-.hero::before{position:absolute;content:"";inset:0;z-index:-1;background:radial-gradient(#195b4730 .8px,transparent .9px);background-size:16px 16px;mask-image:linear-gradient(135deg,transparent 32%,#000 85%)}
-.label{display:inline-flex;align-items:center;gap:7px;color:var(--green);font-size:11px;font-weight:730;letter-spacing:.095em;text-transform:uppercase}
-.hero h1{font-size:clamp(36px,5.2vw,63px);font-weight:710;line-height:1.02;letter-spacing:-.065em;margin-top:10px}
-.hero p{margin-top:11px;color:#3c6058;max-width:32ch;font-size:15px}
-.building{display:block;width:min(100%,535px);height:auto;max-height:324px;align-self:center;margin:0 auto -8px;overflow:visible}
-.building .storey{transform-box:fill-box;transform-origin:center;animation:assemble .64s both;animation-delay:var(--delay)}
-.building .route{stroke-dasharray:6 6;animation:route 4s linear both}
-.building .beacon{transform-box:fill-box;transform-origin:center;animation:beacon 2s ease-out 2 both}
-@keyframes assemble{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
-@keyframes route{to{stroke-dashoffset:-120}}
-@keyframes beacon{0%{opacity:.75;transform:scale(.6)}75%,100%{opacity:0;transform:scale(1.65)}}
-.fig-caption{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;color:#365e54;margin-top:auto}
-.fig-caption .icon{width:15px;height:15px}
-.signin{display:grid;place-items:center;padding:42px 50px;min-width:0}
-.signin-content{width:min(100%,386px)}
-.status-icon{display:grid;place-items:center;background:#eaf5ef;color:var(--green);width:45px;height:45px;border-radius:12px;border:1px solid #d9ede3;margin-bottom:16px}
-.signin h2,.panel-header h1{font-size:clamp(31px,4vw,46px);line-height:1.05;letter-spacing:-.055em;font-weight:710}
-.subtext{color:var(--muted);margin-top:10px;max-width:47ch}
-form{margin-top:24px}
-.field-label{display:block;margin-bottom:7px;font-size:13px;font-weight:730}
-.passline{position:relative}
-#username{padding-right:13px;margin-bottom:12px}
-input{width:100%;height:53px;border:1px solid #b8cdc3;border-radius:9px;background:#fcfdfc;padding:0 52px 0 13px;color:var(--ink)}
-input::placeholder{color:#5d726c}
-input[aria-invalid=true]{border-color:#bc6474}
-.reveal{position:absolute;top:5px;right:5px;bottom:5px;display:grid;place-items:center;width:43px;border:0;background:none;border-radius:6px;color:var(--muted)}
-.reveal:hover:not(:disabled){background:#edf4f0;color:var(--green)}
+.icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Header */
+.header{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topline{width:min(calc(100% - 48px),1280px);margin-inline:auto;display:flex;min-height:70px;align-items:center;justify-content:space-between;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink)}
+.brand strong{display:block;line-height:1.15;font-size:18px;font-weight:750;letter-spacing:-.03em;color:#0B231E}
+.brand small{font-size:11px;color:var(--muted);font-weight:550;letter-spacing:.02em}
+.mark{width:42px;height:42px;flex:none;filter:drop-shadow(0 4px 10px rgba(0,122,94,0.22))}
+.sys-status{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:650;color:#007A5E;background:#E1F5EC;padding:6px 14px;border-radius:30px;border:1px solid #BFE7D5}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#007A5E;box-shadow:0 0 0 0 rgba(0,122,94,0.7);animation:pulse-ring 1.8s infinite}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(0,122,94,0.7)}70%{box-shadow:0 0 0 9px rgba(0,122,94,0)}100%{box-shadow:0 0 0 0 rgba(0,122,94,0)}}
+
+/* Layout */
+.shell{width:min(calc(100% - 48px),1280px);margin:32px auto 40px;flex:1;display:grid;place-items:center}
+.main-card{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:var(--paper);overflow:hidden;box-shadow:var(--shadow);display:grid;grid-template-columns:1.25fr 1fr;min-height:640px}
+
+/* Left Hero / Medical Infographics */
+.hero{position:relative;background:linear-gradient(150deg,#072E27 0%,#0A3E34 45%,#0F4A3F 100%);color:#FFFFFF;padding:42px 46px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(13,148,136,0.25) 0%,transparent 60%),radial-gradient(circle at 10% 80%,rgba(0,122,94,0.3) 0%,transparent 50%);z-index:-1}
+
+/* ECG Line Animation */
+.ecg-wrap{position:relative;width:100%;margin:16px 0 20px;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:14px;backdrop-filter:blur(8px)}
+.ecg-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.08em;color:#94D8C5;text-transform:uppercase;margin-bottom:6px}
+.ecg-svg{width:100%;height:44px;display:block;overflow:visible}
+.ecg-base{stroke:rgba(255,255,255,0.15);stroke-width:1.5;fill:none}
+.ecg-pulse{stroke:#2DD4BF;stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:160 400;animation:ecg-flow 2.8s linear infinite;filter:drop-shadow(0 0 6px #2DD4BF)}
+@keyframes ecg-flow{from{stroke-dashoffset:560}to{stroke-dashoffset:0}}
+
+/* Hero Header */
+.badge-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(45,212,191,0.15);border:1px solid rgba(45,212,191,0.35);color:#5EEAD4;font-size:11px;font-weight:750;letter-spacing:.09em;text-transform:uppercase;padding:5px 12px;border-radius:20px}
+.hero h1{font-size:clamp(32px,3.8vw,48px);font-weight:800;line-height:1.08;letter-spacing:-.045em;margin-top:14px}
+.hero h1 span{background:linear-gradient(90deg,#FFFFFF 30%,#A7F3D0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{color:#B8D5CD;font-size:14px;margin-top:10px;line-height:1.5;max-width:44ch}
+
+/* Medical Infographic Stats Grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 16px}
+.stat-card{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:13px;padding:12px 14px;backdrop-filter:blur(6px);transition:all .2s ease}
+.stat-card:hover{background:rgba(255,255,255,0.12);border-color:rgba(45,212,191,0.4);transform:translateY(-2px)}
+.stat-val{font-size:24px;font-weight:800;letter-spacing:-.03em;color:#FFFFFF;display:flex;align-items:center;gap:6px}
+.stat-val small{font-size:13px;color:#5EEAD4;font-weight:600}
+.stat-label{font-size:11px;color:#A9C9C0;font-weight:600;margin-top:3px}
+
+/* Interactive 3D Building Floor Visual */
+.isometric-view{position:relative;background:rgba(0,0,0,0.22);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px;margin-top:auto}
+.iso-header{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#A9C9C0;font-weight:650;margin-bottom:8px}
+.building-svg{width:100%;height:auto;max-height:165px;display:block}
+.storey-box{transition:all .3s ease;cursor:pointer}
+.storey-box:hover{filter:brightness(1.2)}
+.beacon-pulse{transform-box:fill-box;transform-origin:center;animation:pulse-beacon 2s infinite ease-out}
+@keyframes pulse-beacon{0%{opacity:.85;transform:scale(.7)}100%{opacity:0;transform:scale(2.2)}}
+
+/* Right Sign-in Form */
+.signin{display:flex;flex-direction:column;justify-content:center;padding:48px 52px;background:var(--paper);min-width:0}
+.signin-inner{width:100%;max-width:390px;margin-inline:auto}
+.signin-badge{display:grid;place-items:center;width:50px;height:50px;border-radius:14px;background:#E1F5EC;color:var(--green);border:1px solid #BFE7D5;margin-bottom:18px;box-shadow:0 6px 16px rgba(0,122,94,0.1)}
+.signin h2{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1.1;color:#0F1F2C}
+.signin-sub{color:var(--muted);font-size:14px;margin-top:8px;line-height:1.45}
+
+/* Form inputs */
+form{margin-top:28px}
+.field-group{margin-bottom:18px}
+.field-label{display:block;margin-bottom:7px;font-size:13px;font-weight:700;color:#182C45}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-icon{position:absolute;left:14px;color:#78909C;pointer-events:none}
+input{width:100%;height:52px;border:1px solid #C4D5E2;border-radius:11px;background:#F9FBFC;padding:0 46px 0 44px;color:var(--ink);font-size:14px;font-weight:550;transition:all .18s ease}
+input:hover{border-color:#A3BED2}
+input:focus{background:#FFFFFF;border-color:var(--green);box-shadow:0 0 0 4px rgba(0,122,94,0.12);outline:none}
+input::placeholder{color:#8A9BA8;font-weight:450}
+input[aria-invalid=true]{border-color:var(--error);background:#FFF9F9}
+
+.reveal-btn{position:absolute;right:8px;display:grid;place-items:center;width:36px;height:36px;border:0;background:transparent;border-radius:8px;color:#78909C;transition:all .15s}
+.reveal-btn:hover{background:#EEF3F7;color:var(--green)}
 .eye-slash{display:none}
-.reveal[aria-pressed=true] .eye-slash{display:block}
-.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #cbdcd4;background:white;padding:10px 13px;min-height:40px;border-radius:9px;font-size:13px;font-weight:700}
-.button:hover:not(:disabled){background:#f0f7f3}
-.button.primary{background:var(--green);border-color:var(--green);color:white}
-.button.primary:hover:not(:disabled){background:var(--green-hover)}
-.button .icon{width:17px;height:17px}
-.button:disabled{opacity:.62}
-.full{width:100%;margin-top:14px;justify-content:space-between;min-height:47px;padding-inline:14px}
-.loader{display:inline-block;border:2px solid #ffffff7a;border-top-color:white;width:16px;height:16px;border-radius:50%;animation:spin .72s linear infinite}
+.reveal-btn[aria-pressed=true] .eye-slash{display:block}
+
+/* Action button */
+.btn-submit{width:100%;height:52px;background:linear-gradient(135deg,#007A5E 0%,#00624B 100%);color:#FFFFFF;border:0;border-radius:11px;font-size:15px;font-weight:750;letter-spacing:.01em;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 24px rgba(0,122,94,0.25);margin-top:14px;transition:all .18s ease}
+.btn-submit:hover:not(:disabled){background:linear-gradient(135deg,#008B6B 0%,#006E54 100%);transform:translateY(-1px);box-shadow:0 12px 28px rgba(0,122,94,0.32)}
+.btn-submit:active:not(:disabled){transform:translateY(0)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed}
+.loader{display:inline-block;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#FFFFFF;width:18px;height:18px;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.notice{padding:9px 11px;margin-top:10px;color:var(--error);background:var(--error-bg);font-size:13px;border:1px solid #eed3da;border-radius:8px}
-.notice[data-tone=warning]{color:var(--warning);background:var(--warning-bg);border-color:#f1dfbc}
-.notice[data-tone=success]{color:var(--green);background:#edf7f2;border-color:#cde8db}
-.demo-actions{margin-top:17px;padding-top:13px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:7px 15px;align-items:baseline}
-.text-button{border:0;background:none;padding:3px 0;color:var(--green);text-decoration:underline;text-underline-offset:3px;font-size:12px;font-weight:730}
-.ejected{font-size:12px;color:var(--muted)}
-.signed-summary{display:grid;gap:12px;margin-block:20px}
-.signed-summary div{padding:12px 13px;border:1px solid var(--border);border-radius:9px;background:#f8fbfa;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
-.signed-summary span{color:var(--muted)}
-.actions-inline{display:flex;flex-wrap:wrap;gap:8px}
-.sandbox{margin-top:13px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px 17px;box-shadow:none;border-radius:14px}
-.sandbox-title{display:flex;gap:9px;align-items:center}
-.sandbox-title .icon{color:var(--green)}
-.sandbox strong{font-size:13px}
-.scenario-actions{display:flex;gap:6px;flex-wrap:wrap}
-.scenario-actions button{min-height:37px;padding:6px 10px;background:#f8fbfa}
-.scenario-actions button[aria-pressed=true]{color:var(--green);background:#e7f4ed;border-color:#bcded1}
-.panel-header{padding:32px 35px 20px}
-.panel-header .label{margin-bottom:8px}
-.arch-inner,.brand-inner{padding:3px 35px 31px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:21px}
-.toolbar .button,.arch-node{min-height:42px}
-.arch-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;list-style:none;padding:0}
-.arch-flow li{position:relative;min-width:0}
-.arch-flow li:not(:last-child)::after{content:"→";color:#77938b;font-size:17px;position:absolute;top:53px;right:-14px;z-index:1;pointer-events:none}
-.arch-node{width:100%;height:100%;min-height:137px;text-align:left;border:1px solid var(--border);background:#f6faf8;border-radius:11px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:5px}
-.arch-node .icon{color:var(--green);margin-bottom:5px}
-.arch-node strong{font-size:15px;line-height:1.2}
-.arch-node small{color:var(--muted);line-height:1.3}
-.arch-node[aria-pressed=true]{border-color:#388b70;background:#eaf7f0;box-shadow:0 0 0 2px #174e3a0b}
-.arch-node[data-result=reject]{background:#fff4f5;border-color:#d48696}
-.arch-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:19px}
-.arch-box{background:#f7faf9;border:1px solid var(--border);border-radius:11px;padding:15px 16px;min-height:115px}
-.arch-box h3{font-size:16px;margin-bottom:5px}
-.arch-box p,.arch-box li{font-size:13px;color:var(--muted);line-height:1.55}
-.arch-box ol{padding-left:18px}
-.brand-inner{display:grid;grid-template-columns:1.16fr 1fr;gap:18px}
-.showcase{display:flex;flex-direction:column;justify-content:space-between;align-items:center;gap:17px;padding:23px 15px 17px;border:1px solid var(--border);border-radius:12px;background:#f0f8f4}
-.showcase.dark{background:#123d34;color:white}
-.showcase.dark .mark{background:none}
-.showcase .brand{color:inherit;flex-wrap:wrap;justify-content:center}
-.showcase.dark .brand small{color:#d4eee4}
-.showcase .brand strong{font-size:clamp(23px,4.4vw,45px)}
-.showcase .brand small{font-size:clamp(12px,1.6vw,16px)}
-.showcase .mark{width:clamp(45px,8vw,74px);height:clamp(45px,8vw,74px)}
-.showcase .brand-preview{display:grid;place-items:center;min-height:174px}
-.brand-spec{display:grid;gap:11px}
-.swatch{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px}
-.swatch i{background:var(--swatch);width:27px;height:27px;border:1px solid #6d837747;border-radius:6px}
-.swatch code{color:var(--muted);font-family:ui-monospace,monospace}
-.brand-spec p{font-size:13px;color:var(--muted)}
-.foot{margin:15px 1px 0;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:8px 18px;flex-wrap:wrap}
-@media(max-width:910px){.topline,.shell{width:calc(100% - 36px)}.hero{padding:28px 27px 22px}.signin{padding:32px 28px}.panel-header,.arch-inner,.brand-inner{padding-left:23px;padding-right:23px}}
-@media(max-width:680px){
-  .topline{flex-wrap:wrap;gap:8px;min-height:0;padding:11px 0 8px}.tabs{order:3;width:100%;overflow:auto}.tab{padding:7px 10px}
-  .shell{margin-top:15px}.main-grid{grid-template-columns:minmax(0,1fr)}.hero{border-right:0;border-bottom:1px solid var(--border)}
-  .hero h1{font-size:40px}.hero p{margin-top:7px}.building{max-height:155px;margin-top:0}.fig-caption{margin-top:9px}
-  .signin{padding:28px 23px 30px}.sandbox{align-items:flex-start;flex-direction:column;padding:12px}
-  .panel-header{padding-top:24px}.arch-flow{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.arch-flow li::after{display:none}
-  .arch-detail,.brand-inner{grid-template-columns:minmax(0,1fr)}.arch-node{min-height:105px;padding:10px}
+
+.notice{padding:11px 14px;margin-top:14px;color:var(--error);background:var(--error-bg);font-size:13px;font-weight:600;border:1px solid #FECACA;border-radius:9px;line-height:1.4}
+.notice[data-tone=warning]{color:var(--warning);background:var(--warning-bg);border-color:#FDE68A}
+.notice[data-tone=success]{color:#065F46;background:#D1FAE5;border-color:#A7F3D0}
+
+/* Signed in view */
+.signed-card{padding:20px;border:1px solid #BFE7D5;border-radius:14px;background:#F0FDF4;margin-top:10px}
+.signed-card h2{font-size:22px;color:#065F46;font-weight:800}
+.signed-card p{font-size:13px;color:#047857;margin:6px 0 16px}
+.signed-btn{width:100%;height:48px;background:#007A5E;color:#FFFFFF;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:750}
+
+/* Responsive */
+@media(max-width:960px){
+  .main-card{grid-template-columns:1fr;min-height:auto}
+  .hero{padding:32px 28px}
+  .signin{padding:36px 28px}
 }
-@media(max-width:390px){.topline,.shell{width:calc(100% - 24px)}.hero,.signin{padding-inline:17px}.panel-header,.arch-inner,.brand-inner{padding-inline:15px}.prototype{font-size:11px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+@media(max-width:480px){
+  .topline,.shell{width:calc(100% - 28px)}
+  .stats-grid{grid-template-columns:1fr}
+  .hero h1{font-size:28px}
+}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <symbol id="brand-mark" viewBox="0 0 48 48">
-    <rect width="48" height="48" rx="12" fill="#08644F"/>
-    <path d="M13 34V14h22v20" fill="none" stroke="white" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M11.5 25h7l3.5-6 4.25 10 2.9-4h7.35" fill="none" stroke="#A1E5CC" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/>
-  </symbol>
-  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4m-4 4v2"/></symbol>
-  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
-  <symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
-  <symbol id="layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
-  <symbol id="server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01m3-10h6m-6 10h6"/></symbol>
-  <symbol id="grid" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M10 9v12"/></symbol>
-  <symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol>
-  <symbol id="flask" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v7L5 18a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3M8 14h8"/></symbol>
-  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></symbol>
-</defs>
-</svg>
+
 <header class="header">
   <div class="topline">
-    <div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#brand-mark"/></svg><div><strong>Poliklinika</strong><small>Rahbar nazorati</small></div></div>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 48 48" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="12" fill="#007A5E"/>
+        <path d="M13 34V14h22v20" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 25h7l3.5-7 4.5 11 3-5h8" fill="none" stroke="#6EE7B7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <strong>Poliklinika</strong>
+        <small>Rahbar va ma’muriyat nazorati</small>
+      </div>
+    </div>
+    <div class="sys-status">
+      <span class="pulse-dot"></span>
+      <span>Tizim faol · 24/7 Monitoring</span>
+    </div>
   </div>
 </header>
+
 <main class="shell">
-  <div id="view-login" role="tabpanel" aria-labelledby="tab-login">
-    <div class="panel main-grid">
-      <section class="hero" aria-labelledby="hero-title">
-        <span class="label">Poliklinika boshqaruvi</span>
-        <h1 id="hero-title">Rahbar paneli</h1>
-        <p>Davomat, kirish-chiqish qaydlari va bino bo‘ylab harakat.</p>
-        <svg class="building" viewBox="0 0 520 312" role="img" aria-labelledby="building-title" xmlns="http://www.w3.org/2000/svg">
-          <title id="building-title">Poliklinikaning uch qavati va ular orasidagi yo‘lning shartli chizmasi</title>
+  <div class="main-card">
+    <!-- Left Hero: Medical Animated Infographics -->
+    <section class="hero" aria-label="Tibbiy monitoring infografikasi">
+      <div>
+        <div class="badge-tag">
+          <svg class="icon" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg>
+          Smart Poliklinika Tizimi
+        </div>
+        <h1>
+          <span>Rahbar nazorati</span><br>va situatsion tahlil
+        </h1>
+        <p class="hero-sub">
+          Xodimlar davomati, Face ID kirish-chiqish nuqtalari, 3 qavatli bino monitoringi va real vaqtdagi bemorlar oqimi.
+        </p>
+
+        <!-- Medical Pulse / ECG Graphic -->
+        <div class="ecg-wrap">
+          <div class="ecg-header">
+            <span>Kardiogramma va sensorlar oqimi</span>
+            <span style="color:#5EEAD4">Normal · 74 BPM</span>
+          </div>
+          <svg class="ecg-svg" viewBox="0 0 500 50" preserveAspectRatio="none">
+            <path class="ecg-base" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
+            <path class="ecg-pulse" d="M0 25 L80 25 L95 10 L105 40 L115 5 L125 45 L135 20 L145 25 L280 25 L295 10 L305 40 L315 5 L325 45 L335 20 L345 25 L500 25"/>
+          </svg>
+        </div>
+
+        <!-- 4 Key Medical Infographic Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-val">45 <small>ta</small></div>
+            <div class="stat-label">AI Kameralar va Face ID</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">3 <small>qavat</small></div>
+            <div class="stat-label">To‘liq bino 3D qamrovi</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">98.6%</div>
+            <div class="stat-label">Tibbiy navbat samaradorligi</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-val">100%</div>
+            <div class="stat-label">Avtomatik xavfsizlik nazorati</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Isometric 3D Medical Building Overview -->
+      <div class="isometric-view">
+        <div class="iso-header">
+          <span>Bino arxitekturasi va harakat sxemasi</span>
+          <span style="color:#5EEAD4">3 Qavat · 45 Nuqta</span>
+        </div>
+        <svg class="building-svg" viewBox="0 0 500 210" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="deck" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#def2e9"/></linearGradient>
-            <g id="blueprint">
-              <path d="M12 71 254 98 390 31 390 42 254 110 12 82Z" fill="#a9d0c2" stroke="#5c9c8b" stroke-width="1"/>
-              <path d="M254 98 390 31 390 42 254 110Z" fill="#cbe6db" stroke="#5c9c8b" stroke-width="1"/>
-              <path d="M12 71 148 5 390 31 254 98Z" fill="url(#deck)" stroke="#4e9181" stroke-width="1.25"/>
-              <g fill="none" stroke="#76aa9f" stroke-width="1">
-                <path d="m35 61 224 23 97-48-224-24M58 50l224 24M82 38l224 25M109 24l223 25"/>
-                <path d="m70 75 115-56M112 80l115-56m-69 61 117-57m-75 61L317 32m-71 62 116-57"/>
-                <path d="m80 40 55-28 40 5-57 27Zm172 33 54-27 37 4-55 27Z" fill="#d0ebdf"/>
-              </g>
+            <linearGradient id="floorGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#0F766E" stop-opacity="0.15"/>
+            </linearGradient>
+            <g id="floorTemplate">
+              <path d="M20 50 L250 82 L480 30 L250 0 Z" fill="url(#floorGrad)" stroke="#2DD4BF" stroke-width="1.2"/>
+              <line x1="100" y1="40" x2="330" y2="10" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
+              <line x1="170" y1="52" x2="400" y2="20" stroke="rgba(45,212,191,0.4)" stroke-width="1" stroke-dasharray="3 3"/>
             </g>
           </defs>
-          <path d="m29 263 140-70 286 35-143 74Z" fill="#86bba83b"/>
-          <g class="storey" style="--delay:.26s"><use href="#blueprint" x="50" y="183"/></g>
-          <g class="storey" style="--delay:.14s"><use href="#blueprint" x="50" y="112"/></g>
-          <g class="storey" style="--delay:0s"><use href="#blueprint" x="50" y="41"/></g>
-          <g fill="none" stroke="#19725d" stroke-width="2.2" stroke-linecap="round">
-            <path class="route" d="m137 110 101-50 103 12-72 36 1 72 71 10-2 66-101-11-55 28"/>
+
+          <!-- 3rd Floor -->
+          <g class="storey-box" transform="translate(0, 10)">
+            <use href="#floorTemplate"/>
+            <circle cx="250" cy="40" r="4" fill="#34D399"/>
+            <circle class="beacon-pulse" cx="250" cy="40" r="12" fill="none" stroke="#34D399" stroke-width="1.5"/>
+            <text x="430" y="25" fill="#A7F3D0" font-size="11" font-weight="700">3-Qavat (Statsionar)</text>
           </g>
-          <g fill="#0c6956" stroke="#fff" stroke-width="2"><circle cx="137" cy="110" r="5"/><circle cx="269" cy="108" r="5"/><circle cx="270" cy="180" r="5"/><circle cx="339" cy="256" r="5"/><circle cx="183" cy="273" r="5"/></g>
-          <circle class="beacon" cx="137" cy="110" r="13" fill="none" stroke="#0d735b" stroke-width="1.5"/>
-          <g stroke="#749c8e" fill="none" stroke-dasharray="3 4"><path d="M408 86h30"/><path d="M408 157h30"/><path d="M408 228h30"/></g>
-          <g font-family="system-ui,sans-serif" font-size="12" fill="#2e5b50" font-weight="650"><text x="442" y="90">3-qavat</text><text x="442" y="161">2-qavat</text><text x="442" y="232">1-qavat</text></g>
+
+          <!-- 2nd Floor -->
+          <g class="storey-box" transform="translate(0, 65)">
+            <use href="#floorTemplate"/>
+            <circle cx="180" cy="50" r="4" fill="#38BDF8"/>
+            <circle class="beacon-pulse" cx="180" cy="50" r="12" fill="none" stroke="#38BDF8" stroke-width="1.5"/>
+            <text x="430" y="25" fill="#BAE6FD" font-size="11" font-weight="700">2-Qavat (Diagnostika)</text>
+          </g>
+
+          <!-- 1st Floor -->
+          <g class="storey-box" transform="translate(0, 120)">
+            <use href="#floorTemplate"/>
+            <circle cx="310" cy="45" r="4" fill="#F472B6"/>
+            <circle class="beacon-pulse" cx="310" cy="45" r="12" fill="none" stroke="#F472B6" stroke-width="1.5"/>
+            <text x="430" y="25" fill="#FBCFE8" font-size="11" font-weight="700">1-Qavat (Qabulxona)</text>
+          </g>
+
+          <!-- Route connecting floors -->
+          <path d="M310 165 L250 130 L180 115 L250 50" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
         </svg>
-        <span class="fig-caption"><svg class="icon" aria-hidden="true"><use href="#layers"/></svg> Uch qavatning konseptual chizmasi</span>
-      </section>
-      <section class="signin" aria-label="Kirish va seans">
-        <div class="signin-content">
-          <div id="access-view">
-            <span class="status-icon" aria-hidden="true"><svg class="icon"><use href="#lock"/></svg></span>
-            <h2 id="login-title" tabindex="-1">Tizimga kirish</h2>
-            <p class="subtext">Rahbar panelini ochish uchun login va parolni kiriting.</p>
-            <form id="login-form" novalidate>
+      </div>
+    </section>
+
+    <!-- Right Sign-in Form -->
+    <section class="signin" aria-label="Tizimga kirish bo'limi">
+      <div class="signin-inner">
+        <div id="access-view">
+          <div class="signin-badge">
+            <svg class="icon" style="width:24px;height:24px" viewBox="0 0 24 24">
+              <rect x="5" y="11" width="14" height="10" rx="2"/>
+              <path d="M8 11V7a4 4 0 1 1 8 0v4m-4 4v2"/>
+            </svg>
+          </div>
+          <h2 id="login-title">Tizimga kirish</h2>
+          <p class="signin-sub">Rahbar nazorati paneliga o‘tish uchun ma’lumotlaringizni kiriting.</p>
+
+          <form id="login-form" novalidate>
+            <div class="field-group">
               <label class="field-label" for="username">Login</label>
-              <input id="username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="Loginni kiriting" required>
+              <div class="input-wrap">
+                <svg class="icon input-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input id="username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="Loginni kiriting" required>
+              </div>
+            </div>
+
+            <div class="field-group">
               <label class="field-label" for="password">Parol</label>
-              <div class="passline">
+              <div class="input-wrap">
+                <svg class="icon input-icon" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/></svg>
                 <input id="password" type="password" autocomplete="off" placeholder="Parolni kiriting" maxlength="50" required>
-                <button class="reveal" type="button" id="reveal" aria-pressed="false" aria-label="Parolni ko‘rsatish">
-                  <svg class="icon" aria-hidden="true"><use href="#eye"/><path class="eye-slash" d="m4 4 16 16"/></svg>
+                <button class="reveal-btn" type="button" id="reveal" aria-pressed="false" aria-label="Parolni ko‘rsatish">
+                  <svg class="icon" viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="2.5"/><path class="eye-slash" d="m4 4 16 16"/></svg>
                 </button>
               </div>
-              <p class="notice" id="warning" role="status" aria-live="polite" hidden></p>
-              <button class="button primary full" type="submit" id="submit"><span id="submit-label">Kirish</span><svg class="icon" id="submit-arrow" aria-hidden="true"><use href="#arrow"/></svg><span class="loader" id="loader" aria-hidden="true" hidden></span></button>
-            </form>
-          </div>
-          <div id="signed-view" hidden>
-            <span class="status-icon" aria-hidden="true"><svg class="icon"><use href="#check"/></svg></span>
-            <h2 id="signed-title" tabindex="-1">Rahbar paneli ochildi</h2>
-            <p class="subtext">Kirish muvaffaqiyatli. Quyida namoyish seansining holati.</p>
-            <div class="signed-summary">
-              <div><span>Rol</span><strong>Rahbar</strong></div>
-              <div><span>Seans</span><strong>Faol</strong></div>
             </div>
-            <div class="actions-inline">
-              <a href="dashboard.html" class="button primary" id="open-panel">Rahbar paneliga o‘tish →</a>
-              <button class="button" type="button" id="logout">Chiqish</button>
-              <button class="button" type="button" id="expire">Seans tugashini sinash</button>
-            </div>
+
+            <p class="notice" id="warning" role="status" aria-live="polite" hidden></p>
+
+            <button class="btn-submit" type="submit" id="submit">
+              <span id="submit-label">Tizimga kirish</span>
+              <svg class="icon" id="submit-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+              <span class="loader" id="loader" aria-hidden="true" hidden></span>
+            </button>
+          </form>
+        </div>
+
+        <div id="signed-view" hidden>
+          <div class="signed-card">
+            <h2>Kirish tasdiqlandi</h2>
+            <p>Seans muvaffaqiyatli ochildi. Rahbar nazorati paneliga yo‘naltirilmoqda...</p>
+            <a href="dashboard.html" class="signed-btn" id="open-panel">
+              <span>Rahbar paneliga o‘tish</span>
+              <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
+            </a>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
-  <section class="panel" id="view-architecture" role="tabpanel" aria-labelledby="tab-architecture" hidden>
-    <div class="panel-header">
-      <span class="label">Kirish arxitekturasi</span>
-      <h1>Kirishdan rahbar paneligacha</h1>
-      <p class="subtext">Bosqichni tanlang yoki kirish jarayonini ketma-ket ko‘ring.</p>
-    </div>
-    <div class="arch-inner">
-      <div class="toolbar" aria-label="Arxitektura animatsiyasi">
-        <button class="button primary" type="button" id="play-success">Muvaffaqiyatli kirish</button>
-        <button class="button" type="button" id="play-wrong">Rad etilgan kirish</button>
-      </div>
-      <ol class="arch-flow">
-        <li><button class="arch-node" type="button" data-stage="0" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#lock"/></svg><strong>01 · Kirish shakli</strong><small>Login va parolni yuborish</small></button></li>
-        <li><button class="arch-node" type="button" data-stage="1" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#server"/></svg><strong>02 · Server tekshiruvi</strong><small>Parol xeshi va urinishlar</small></button></li>
-        <li><button class="arch-node" type="button" data-stage="2" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#check"/></svg><strong>03 · Seans yaratish</strong><small>Seans cookie-si</small></button></li>
-        <li><button class="arch-node" type="button" data-stage="3" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#grid"/></svg><strong>04 · Rahbar paneli</strong><small>Faol seans bilan kirish</small></button></li>
-      </ol>
-      <div class="arch-detail">
-        <div class="arch-box" aria-live="polite"><h3 id="stage-title"></h3><p id="stage-copy"></p></div>
-        <div class="arch-box"><h3>Qayd etilgan bosqichlar</h3><ol id="trace"></ol></div>
-      </div>
-    </div>
-  </section>
-  <section class="panel" id="view-brand" role="tabpanel" aria-labelledby="tab-brand" hidden>
-    <div class="panel-header">
-      <span class="label">Logo va ranglar</span>
-      <h1>Poliklinika brendi</h1>
-      <p class="subtext">Kirish eshigi va puls chizig‘i bitta belgida birlashgan.</p>
-    </div>
-    <div class="brand-inner">
-      <div class="showcase" id="showcase">
-        <div class="brand-preview"><div class="brand"><svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><use href="#brand-mark"/></svg><div><strong>Poliklinika</strong><small>Rahbar nazorati</small></div></div></div>
-        <div class="actions-inline">
-          <button class="button" type="button" id="switch-background" aria-pressed="false">To‘q fonda ko‘rish</button>
-          <button class="button" type="button" id="logo-download"><svg class="icon" aria-hidden="true"><use href="#download"/></svg> SVG belgi</button>
-        </div>
-      </div>
-      <div class="brand-spec">
-        <div class="swatch" style="--swatch:#08644F"><i aria-hidden="true"></i><strong>Asosiy yashil</strong><code>#08644F</code></div>
-        <div class="swatch" style="--swatch:#A1E5CC"><i aria-hidden="true"></i><strong>Yorqin yalpiz</strong><code>#A1E5CC</code></div>
-        <div class="swatch" style="--swatch:#162A29"><i aria-hidden="true"></i><strong>Asosiy matn</strong><code>#162A29</code></div>
-        <div class="swatch" style="--swatch:#F3F6F5"><i aria-hidden="true"></i><strong>Ochiq fon</strong><code>#F3F6F5</code></div>
-        <p>Belgi kichik ekranda alohida qo‘llanadi. To‘liq yozuv tizim nomi va panel vazifasini ko‘rsatadi.</p>
-      </div>
-    </div>
-  </section>
 </main>
+
 <script>
 'use strict';
 
 const $ = id => document.getElementById(id);
-const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
-const scenarioButtons = Array.from(document.querySelectorAll('[data-scenario]'));
-const stageButtons = Array.from(document.querySelectorAll('[data-stage]'));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const maximumAttempts = 5;
 
 let attempts = 0;
 let pendingLogin = null;
-let pendingFlow = null;
-
-function showTab(index, focus = false) {
-  for (const [position, tab] of tabs.entries()) {
-    const active = index === position;
-    tab.setAttribute('aria-selected', String(active));
-    tab.tabIndex = active ? 0 : -1;
-    const ctrl = $(tab.getAttribute('aria-controls'));
-    if (ctrl) ctrl.hidden = !active;
-  }
-  if (index !== 1) {
-    clearTimeout(pendingFlow);
-    pendingFlow = null;
-  }
-  if (focus && tabs[index]) tabs[index].focus();
-}
-
-for (const [index, tab] of tabs.entries()) {
-  tab.addEventListener('click', () => showTab(index));
-  tab.addEventListener('keydown', event => {
-    const targets = {
-      ArrowRight: (index + 1) % tabs.length,
-      ArrowLeft: (index + tabs.length - 1) % tabs.length,
-      Home: 0,
-      End: tabs.length - 1,
-    };
-    const target = targets[event.key];
-    if (target === undefined) return;
-    event.preventDefault();
-    showTab(target, true);
-  });
-}
 
 const username = $('username');
 const input = $('password');
@@ -366,7 +351,6 @@ function message(text = '', tone = 'error', affected = [username, input]) {
     if (!field) continue;
     const invalid = Boolean(text) && tone === 'error' && affected.includes(field);
     field.setAttribute('aria-invalid', String(invalid));
-    field.setAttribute('aria-describedby', invalid ? 'warning demo-hint' : 'demo-hint');
   }
 }
 
@@ -374,12 +358,11 @@ function controls(mode = 'ready') {
   const busy = mode === 'busy';
   const disabled = busy || mode === 'limited';
   const submitBtn = $('submit');
-  const fillBtn = $('fill-demo');
-  for (const button of [username, input, reveal, fillBtn, submitBtn]) {
+  for (const button of [username, input, reveal, submitBtn]) {
     if (button) button.disabled = disabled;
   }
   const label = $('submit-label');
-  if (label) label.textContent = busy ? 'Tekshirilmoqda…' : mode === 'limited' ? 'Kirish vaqtincha cheklangan' : 'Kirish';
+  if (label) label.textContent = busy ? 'Tekshirilmoqda…' : mode === 'limited' ? 'Kirish cheklangan' : 'Tizimga kirish';
   const arrow = $('submit-arrow');
   if (arrow) arrow.hidden = busy || disabled;
   const loader = $('loader');
@@ -388,33 +371,10 @@ function controls(mode = 'ready') {
   if (form) form.setAttribute('aria-busy', String(busy));
 }
 
-function chooseScenario(value = '') {
-  for (const button of scenarioButtons) button.setAttribute('aria-pressed', String(button.dataset.scenario === value));
-}
-
-function showAccess() {
-  const av = $('access-view');
-  if (av) av.hidden = false;
-  const sv = $('signed-view');
-  if (sv) sv.hidden = true;
-}
-
-function clearLogin() {
-  clearTimeout(pendingLogin);
-  pendingLogin = null;
-  attempts = 0;
-  showAccess();
-  controls();
-  message();
-  if (username) username.value = '';
-  if (input) input.value = '';
-  hidePassword(true);
-}
-
 function showLimit() {
   if (input) input.value = '';
   controls('limited');
-  message('5 ta xato urinishdan keyin kirish vaqtincha cheklanadi.', 'warning');
+  message('5 ta xato urinishdan keyin kirish vaqtincha cheklandi.', 'warning');
 }
 
 function isCredentialsValid(u, p) {
@@ -426,7 +386,7 @@ function isCredentialsValid(u, p) {
   return false;
 }
 
-function verifyDemo(login, password, origin = 'input') {
+function verifyLogin(login, password) {
   if (pendingLogin !== null || attempts >= maximumAttempts) return;
   const missing = [!login && username, !password && input].filter(Boolean);
   if (missing.length) {
@@ -451,32 +411,27 @@ function verifyDemo(login, password, origin = 'input') {
       if (av) av.hidden = true;
       const sv = $('signed-view');
       if (sv) sv.hidden = false;
-      const st = $('signed-title');
-      if (st) st.focus();
       setTimeout(() => {
         window.location.href = 'dashboard.html';
-      }, 400);
+      }, 350);
       return;
     }
     attempts++;
     if (attempts >= maximumAttempts) {
       showLimit();
-      const reset = scenarioButtons.find(button => button.dataset.scenario === 'reset');
-      if (reset) reset.focus();
       return;
     }
     if (input) input.value = '';
     message('Login yoki parol xato. Qayta urinib ko‘ring.');
-    if (origin === 'input' && input) input.focus();
-  }, reduceMotion.matches ? 20 : 500);
+    if (input) input.focus();
+  }, reduceMotion.matches ? 20 : 450);
 }
 
 const loginForm = $('login-form');
 if (loginForm) {
   loginForm.addEventListener('submit', event => {
     event.preventDefault();
-    chooseScenario();
-    verifyDemo(username ? username.value.trim() : '', input ? input.value : '');
+    verifyLogin(username ? username.value.trim() : '', input ? input.value : '');
   });
 }
 
@@ -484,148 +439,9 @@ if (reveal) {
   reveal.addEventListener('click', () => hidePassword(input.type !== 'password'));
 }
 
-function fillDemo() {
-  if (username) username.value = 'admin';
-  if (input) input.value = 'admin123';
-  message();
-  const sub = $('submit');
-  if (sub) sub.focus();
-}
-
-const fillBtn = $('fill-demo');
-if (fillBtn) fillBtn.addEventListener('click', fillDemo);
-
 for (const field of [username, input]) {
   if (field) field.addEventListener('input', () => message());
 }
-
-for (const button of scenarioButtons) {
-  button.addEventListener('click', () => {
-    const scenario = button.dataset.scenario;
-    clearLogin();
-    chooseScenario(scenario);
-    if (scenario === 'reset') {
-      if (username) username.focus();
-      return;
-    }
-    if (scenario === 'success') {
-      fillDemo();
-      return;
-    }
-    if (scenario === 'limited') {
-      attempts = maximumAttempts;
-      showLimit();
-      return;
-    }
-    verifyDemo('xato-login', 'namuna-xato', 'scenario');
-  });
-}
-
-function backToLogin(text, tone) {
-  sessionStorage.removeItem('poliklinika_auth');
-  clearLogin();
-  chooseScenario();
-  message(text, tone);
-  const lt = $('login-title');
-  if (lt) lt.focus();
-}
-
-const logoutBtn = $('logout');
-if (logoutBtn) logoutBtn.addEventListener('click', () => backToLogin('Seans yakunlandi.', 'success'));
-
-const expireBtn = $('expire');
-if (expireBtn) expireBtn.addEventListener('click', () => backToLogin('Seans muddati tugadi. Davom etish uchun qayta kiring.', 'warning'));
-
-const stages = [
-  { title: 'Kirish shakli', copy: 'Jonli dastur login va parolni HTTPS orqali serverga yuboradi. Bu namoyishda yuborish brauzer ichida simulyatsiya qilinadi.' },
-  { title: 'Server tekshiruvi', copy: 'Server loginni va parol xeshini tekshiradi hamda xato urinishlar sonini kuzatadi.' },
-  { title: 'Seans yaratish', copy: 'Login va parol to‘g‘ri bo‘lsa, server seans yaratadi. Jonli HTTPS muhitida cookie HttpOnly va Secure atributlariga ega bo‘ladi.' },
-  { title: 'Rahbar paneli', copy: 'Server faqat faol seans bilan panelni ochadi. Chiqish bosilganda yoki seans muddati tugaganda qayta kirish talab qilinadi.' },
-];
-
-function addTrace(text) {
-  const traceEl = $('trace');
-  if (!traceEl) return;
-  const item = document.createElement('li');
-  item.textContent = text;
-  traceEl.append(item);
-}
-
-function stage(index, reject = false) {
-  for (const [position, button] of stageButtons.entries()) {
-    button.setAttribute('aria-pressed', String(position === index));
-    button.dataset.result = position === index && reject ? 'reject' : '';
-  }
-  const st = $('stage-title');
-  if (st) st.textContent = reject ? 'Kirish rad etildi' : stages[index].title;
-  const sc = $('stage-copy');
-  if (sc) sc.textContent = reject
-    ? 'Server kirishni rad etadi. Seans yaratilmaydi va panel yopiq qoladi.'
-    : stages[index].copy;
-}
-
-function playFlow(reject) {
-  clearTimeout(pendingFlow);
-  const traceEl = $('trace');
-  if (traceEl) traceEl.replaceChildren();
-  let index = 0;
-  const last = reject ? 1 : stages.length - 1;
-  const tick = () => {
-    const rejected = reject && index === last;
-    stage(index, rejected);
-    addTrace(rejected ? 'Kirish rad etildi' : stages[index].title);
-    if (index++ < last) pendingFlow = setTimeout(tick, reduceMotion.matches ? 80 : 900);
-    else pendingFlow = null;
-  };
-  tick();
-}
-
-for (const [index, button] of stageButtons.entries()) {
-  button.addEventListener('click', () => {
-    clearTimeout(pendingFlow);
-    pendingFlow = null;
-    stage(index);
-    const traceEl = $('trace');
-    if (traceEl) traceEl.replaceChildren();
-    addTrace(stages[index].title);
-  });
-}
-
-const playSuccess = $('play-success');
-if (playSuccess) playSuccess.addEventListener('click', () => playFlow(false));
-
-const playWrong = $('play-wrong');
-if (playWrong) playWrong.addEventListener('click', () => playFlow(true));
-
-const switchBg = $('switch-background');
-if (switchBg) {
-  switchBg.addEventListener('click', event => {
-    const showcase = $('showcase');
-    if (!showcase) return;
-    const dark = showcase.classList.toggle('dark');
-    event.currentTarget.setAttribute('aria-pressed', String(dark));
-    event.currentTarget.textContent = dark ? 'Ochiq fonda ko‘rish' : 'To‘q fonda ko‘rish';
-  });
-}
-
-const logoDownload = $('logo-download');
-if (logoDownload) {
-  logoDownload.addEventListener('click', () => {
-    const bm = $('brand-mark');
-    if (!bm) return;
-    const mark = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48"><title>Poliklinika</title>'
-      + bm.innerHTML + '</svg>';
-    const url = URL.createObjectURL(new Blob([mark], { type: 'image/svg+xml' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Poliklinika_belgisi.svg';
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  });
-}
-
-stage(0);
-addTrace(stages[0].title);
 </script>
 </body>
 </html>
