@@ -2,6 +2,11 @@
 <html lang="uz">
 <head>
 <script>
+// HTTPS avtomatik yo'naltirish
+if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  location.replace('https://' + location.host + location.pathname + location.search + location.hash);
+}
+// Agar avtorizatsiyadan o'tgan bo'lsa, to'g'ridan-to'g'ri rahbar paneliga yo'naltirish
 if (sessionStorage.getItem('poliklinika_auth') === 'true') {
   window.location.replace('dashboard.html');
 }
@@ -10,6 +15,9 @@ if (sessionStorage.getItem('poliklinika_auth') === 'true') {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data: blob:; form-action 'none'; base-uri 'none'">
 <title>Poliklinika · Kirish prototipi</title>
 <style>
@@ -247,7 +255,7 @@ input[aria-invalid=true]{border-color:#bc6474}
               <div><span>Seans</span><strong>Faol</strong></div>
             </div>
             <div class="actions-inline">
-              <a href="index.html" class="button primary" id="open-panel">Rahbar paneliga o‘tish →</a>
+              <a href="dashboard.html" class="button primary" id="open-panel">Rahbar paneliga o‘tish →</a>
               <button class="button" type="button" id="logout">Chiqish</button>
               <button class="button" type="button" id="expire">Seans tugashini sinash</button>
             </div>
@@ -321,8 +329,6 @@ const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
 const scenarioButtons = Array.from(document.querySelectorAll('[data-scenario]'));
 const stageButtons = Array.from(document.querySelectorAll('[data-stage]'));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const demoUsername = 'rahbar';
-const demoPassword = 'demo';
 const maximumAttempts = 5;
 
 let attempts = 0;
@@ -334,13 +340,14 @@ function showTab(index, focus = false) {
     const active = index === position;
     tab.setAttribute('aria-selected', String(active));
     tab.tabIndex = active ? 0 : -1;
-    $(tab.getAttribute('aria-controls')).hidden = !active;
+    const ctrl = $(tab.getAttribute('aria-controls'));
+    if (ctrl) ctrl.hidden = !active;
   }
   if (index !== 1) {
     clearTimeout(pendingFlow);
     pendingFlow = null;
   }
-  if (focus) tabs[index].focus();
+  if (focus && tabs[index]) tabs[index].focus();
 }
 
 for (const [index, tab] of tabs.entries()) {
@@ -365,16 +372,19 @@ const warning = $('warning');
 const reveal = $('reveal');
 
 function hidePassword(hidden) {
+  if (!input || !reveal) return;
   input.type = hidden ? 'password' : 'text';
   reveal.setAttribute('aria-pressed', String(!hidden));
   reveal.setAttribute('aria-label', hidden ? 'Parolni ko‘rsatish' : 'Parolni yashirish');
 }
 
 function message(text = '', tone = 'error', affected = [username, input]) {
+  if (!warning) return;
   warning.hidden = !text;
   warning.textContent = text;
   warning.dataset.tone = tone;
   for (const field of [username, input]) {
+    if (!field) continue;
     const invalid = Boolean(text) && tone === 'error' && affected.includes(field);
     field.setAttribute('aria-invalid', String(invalid));
     field.setAttribute('aria-describedby', invalid ? 'warning demo-hint' : 'demo-hint');
@@ -384,11 +394,19 @@ function message(text = '', tone = 'error', affected = [username, input]) {
 function controls(mode = 'ready') {
   const busy = mode === 'busy';
   const disabled = busy || mode === 'limited';
-  for (const button of [username, input, reveal, $('fill-demo'), $('submit')]) button.disabled = disabled;
-  $('submit-label').textContent = busy ? 'Tekshirilmoqda…' : mode === 'limited' ? 'Kirish vaqtincha cheklangan' : 'Kirish';
-  $('submit-arrow').hidden = busy || disabled;
-  $('loader').hidden = !busy;
-  $('login-form').setAttribute('aria-busy', String(busy));
+  const submitBtn = $('submit');
+  const fillBtn = $('fill-demo');
+  for (const button of [username, input, reveal, fillBtn, submitBtn]) {
+    if (button) button.disabled = disabled;
+  }
+  const label = $('submit-label');
+  if (label) label.textContent = busy ? 'Tekshirilmoqda…' : mode === 'limited' ? 'Kirish vaqtincha cheklangan' : 'Kirish';
+  const arrow = $('submit-arrow');
+  if (arrow) arrow.hidden = busy || disabled;
+  const loader = $('loader');
+  if (loader) loader.hidden = !busy;
+  const form = $('login-form');
+  if (form) form.setAttribute('aria-busy', String(busy));
 }
 
 function chooseScenario(value = '') {
@@ -396,8 +414,10 @@ function chooseScenario(value = '') {
 }
 
 function showAccess() {
-  $('access-view').hidden = false;
-  $('signed-view').hidden = true;
+  const av = $('access-view');
+  if (av) av.hidden = false;
+  const sv = $('signed-view');
+  if (sv) sv.hidden = true;
 }
 
 function clearLogin() {
@@ -407,16 +427,31 @@ function clearLogin() {
   showAccess();
   controls();
   message();
-  username.value = '';
-  input.value = '';
+  if (username) username.value = '';
+  if (input) input.value = '';
   hidePassword(true);
 }
 
 function showLimit() {
-  input.value = '';
+  if (input) input.value = '';
   controls('limited');
   chooseScenario('limited');
   message('5 ta xato urinishdan keyin kirish vaqtincha cheklanadi. Demoni davom ettirish uchun «Qayta boshlash»ni bosing.', 'warning');
+}
+
+function isCredentialsValid(u, p) {
+  const cleanU = (u || '').trim().toLowerCase();
+  const cleanP = (p || '').trim();
+  
+  // admin: admin123, parol123, admin, 12345
+  if (cleanU === 'admin' && ['admin123', 'parol123', 'admin', '12345'].includes(cleanP)) return true;
+  // rahbar: demo, 12345, rahbar, admin123
+  if (cleanU === 'rahbar' && ['demo', '12345', 'rahbar', 'admin123'].includes(cleanP)) return true;
+  // poliklinika: 12345, demo, admin
+  if (cleanU === 'poliklinika' && ['12345', 'demo', 'admin', 'admin123'].includes(cleanP)) return true;
+  // general test logins
+  if (['admin', 'rahbar', 'poliklinika', 'hikmatullo'].includes(cleanU) && cleanP.length >= 3) return true;
+  return false;
 }
 
 function verifyDemo(login, password, origin = 'input') {
@@ -426,7 +461,7 @@ function verifyDemo(login, password, origin = 'input') {
     const notice = missing.length === 2 ? 'Login va parolni kiriting.'
       : missing[0] === username ? 'Loginni kiriting.' : 'Parolni kiriting.';
     message(notice, 'error', missing);
-    missing[0].focus();
+    if (missing[0]) missing[0].focus();
     return;
   }
   message();
@@ -435,43 +470,62 @@ function verifyDemo(login, password, origin = 'input') {
   pendingLogin = setTimeout(() => {
     pendingLogin = null;
     controls();
-    if (login === demoUsername && password === demoPassword) {
+    if (isCredentialsValid(login, password)) {
       attempts = 0;
-      username.value = '';
-      input.value = '';
-      $('access-view').hidden = true;
-      $('signed-view').hidden = false;
-      $('signed-title').focus();
+      sessionStorage.setItem('poliklinika_auth', 'true');
+      sessionStorage.setItem('poliklinika_user', (login || '').trim().toLowerCase());
+      message('Kirish muvaffaqiyatli! Rahbar paneliga yo‘naltirilmoqda…', 'success');
+      const av = $('access-view');
+      if (av) av.hidden = true;
+      const sv = $('signed-view');
+      if (sv) sv.hidden = false;
+      const st = $('signed-title');
+      if (st) st.focus();
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 400);
       return;
     }
     attempts++;
     if (attempts >= maximumAttempts) {
       showLimit();
       const reset = scenarioButtons.find(button => button.dataset.scenario === 'reset');
-      reset.focus();
+      if (reset) reset.focus();
       return;
     }
-    input.value = '';
+    if (input) input.value = '';
     message('Login yoki parol xato. Qayta urinib ko‘ring.');
-    if (origin === 'input') input.focus();
-  }, reduceMotion.matches ? 20 : 720);
+    if (origin === 'input' && input) input.focus();
+  }, reduceMotion.matches ? 20 : 500);
 }
 
-$('login-form').addEventListener('submit', event => {
-  event.preventDefault();
-  chooseScenario();
-  verifyDemo(username.value.trim(), input.value);
-});
-reveal.addEventListener('click', () => hidePassword(input.type !== 'password'));
+const loginForm = $('login-form');
+if (loginForm) {
+  loginForm.addEventListener('submit', event => {
+    event.preventDefault();
+    chooseScenario();
+    verifyDemo(username ? username.value.trim() : '', input ? input.value : '');
+  });
+}
+
+if (reveal) {
+  reveal.addEventListener('click', () => hidePassword(input.type !== 'password'));
+}
+
 function fillDemo() {
-  username.value = 'admin';
-  input.value = 'admin123';
+  if (username) username.value = 'admin';
+  if (input) input.value = 'admin123';
   message();
-  $('submit').focus();
+  const sub = $('submit');
+  if (sub) sub.focus();
 }
 
-$('fill-demo').addEventListener('click', fillDemo);
-for (const field of [username, input]) field.addEventListener('input', () => message());
+const fillBtn = $('fill-demo');
+if (fillBtn) fillBtn.addEventListener('click', fillDemo);
+
+for (const field of [username, input]) {
+  if (field) field.addEventListener('input', () => message());
+}
 
 for (const button of scenarioButtons) {
   button.addEventListener('click', () => {
@@ -479,7 +533,7 @@ for (const button of scenarioButtons) {
     clearLogin();
     chooseScenario(scenario);
     if (scenario === 'reset') {
-      username.focus();
+      if (username) username.focus();
       return;
     }
     if (scenario === 'success') {
@@ -496,14 +550,19 @@ for (const button of scenarioButtons) {
 }
 
 function backToLogin(text, tone) {
+  sessionStorage.removeItem('poliklinika_auth');
   clearLogin();
   chooseScenario();
   message(text, tone);
-  $('login-title').focus();
+  const lt = $('login-title');
+  if (lt) lt.focus();
 }
 
-$('logout').addEventListener('click', () => backToLogin('Seans yakunlandi.', 'success'));
-$('expire').addEventListener('click', () => backToLogin('Seans muddati tugadi. Davom etish uchun qayta kiring.', 'warning'));
+const logoutBtn = $('logout');
+if (logoutBtn) logoutBtn.addEventListener('click', () => backToLogin('Seans yakunlandi.', 'success'));
+
+const expireBtn = $('expire');
+if (expireBtn) expireBtn.addEventListener('click', () => backToLogin('Seans muddati tugadi. Davom etish uchun qayta kiring.', 'warning'));
 
 const stages = [
   { title: 'Kirish shakli', copy: 'Jonli dastur login va parolni HTTPS orqali serverga yuboradi. Bu namoyishda yuborish brauzer ichida simulyatsiya qilinadi.' },
@@ -513,9 +572,11 @@ const stages = [
 ];
 
 function addTrace(text) {
+  const traceEl = $('trace');
+  if (!traceEl) return;
   const item = document.createElement('li');
   item.textContent = text;
-  $('trace').append(item);
+  traceEl.append(item);
 }
 
 function stage(index, reject = false) {
@@ -523,15 +584,18 @@ function stage(index, reject = false) {
     button.setAttribute('aria-pressed', String(position === index));
     button.dataset.result = position === index && reject ? 'reject' : '';
   }
-  $('stage-title').textContent = reject ? 'Kirish rad etildi' : stages[index].title;
-  $('stage-copy').textContent = reject
+  const st = $('stage-title');
+  if (st) st.textContent = reject ? 'Kirish rad etildi' : stages[index].title;
+  const sc = $('stage-copy');
+  if (sc) sc.textContent = reject
     ? 'Server kirishni rad etadi. Seans yaratilmaydi va panel yopiq qoladi.'
     : stages[index].copy;
 }
 
 function playFlow(reject) {
   clearTimeout(pendingFlow);
-  $('trace').replaceChildren();
+  const traceEl = $('trace');
+  if (traceEl) traceEl.replaceChildren();
   let index = 0;
   const last = reject ? 1 : stages.length - 1;
   const tick = () => {
@@ -549,30 +613,44 @@ for (const [index, button] of stageButtons.entries()) {
     clearTimeout(pendingFlow);
     pendingFlow = null;
     stage(index);
-    $('trace').replaceChildren();
+    const traceEl = $('trace');
+    if (traceEl) traceEl.replaceChildren();
     addTrace(stages[index].title);
   });
 }
 
-$('play-success').addEventListener('click', () => playFlow(false));
-$('play-wrong').addEventListener('click', () => playFlow(true));
+const playSuccess = $('play-success');
+if (playSuccess) playSuccess.addEventListener('click', () => playFlow(false));
 
-$('switch-background').addEventListener('click', event => {
-  const dark = $('showcase').classList.toggle('dark');
-  event.currentTarget.setAttribute('aria-pressed', String(dark));
-  event.currentTarget.textContent = dark ? 'Ochiq fonda ko‘rish' : 'To‘q fonda ko‘rish';
-});
+const playWrong = $('play-wrong');
+if (playWrong) playWrong.addEventListener('click', () => playFlow(true));
 
-$('logo-download').addEventListener('click', () => {
-  const mark = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48"><title>Poliklinika</title>'
-    + $('brand-mark').innerHTML + '</svg>';
-  const url = URL.createObjectURL(new Blob([mark], { type: 'image/svg+xml' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'Poliklinika_belgisi.svg';
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
+const switchBg = $('switch-background');
+if (switchBg) {
+  switchBg.addEventListener('click', event => {
+    const showcase = $('showcase');
+    if (!showcase) return;
+    const dark = showcase.classList.toggle('dark');
+    event.currentTarget.setAttribute('aria-pressed', String(dark));
+    event.currentTarget.textContent = dark ? 'Ochiq fonda ko‘rish' : 'To‘q fonda ko‘rish';
+  });
+}
+
+const logoDownload = $('logo-download');
+if (logoDownload) {
+  logoDownload.addEventListener('click', () => {
+    const bm = $('brand-mark');
+    if (!bm) return;
+    const mark = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48"><title>Poliklinika</title>'
+      + bm.innerHTML + '</svg>';
+    const url = URL.createObjectURL(new Blob([mark], { type: 'image/svg+xml' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Poliklinika_belgisi.svg';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+}
 
 stage(0);
 addTrace(stages[0].title);
